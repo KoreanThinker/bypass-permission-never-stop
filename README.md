@@ -145,6 +145,10 @@ See `.github/RELEASE_TEMPLATE.md`.
 
 See `CHANGELOG.md`.
 
+## Architecture
+
+See `docs/ARCHITECTURE.md`.
+
 ## FAQ
 
 ### Is this an official Anthropic tool?
