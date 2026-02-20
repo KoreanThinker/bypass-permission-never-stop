@@ -113,3 +113,7 @@ See `docs/TROUBLESHOOTING.md`.
 ## Trusted Publishing
 
 See `docs/TRUSTED_PUBLISHING.md`.
+
+## Release Notes Template
+
+See `.github/RELEASE_TEMPLATE.md`.
