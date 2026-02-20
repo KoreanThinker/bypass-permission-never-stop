@@ -4,7 +4,7 @@
   "description": "Bypass Permission Never Stop - Unofficial Claude Code God Mode Injector",
   "main": "dist/index.js",
   "bin": {
-    "bypass-permission-never-stop": "./dist/cli.js"
+    "bypass-permission-never-stop": "dist/cli.js"
   },
   "scripts": {
     "build": "tsc",
