@@ -17,6 +17,7 @@ All PRs must pass:
 - `npm run build`
 - `npm run test:ci` (coverage threshold enforced in `vitest.config.ts`)
 - `npm pack --dry-run`
+- `gh workflow run Release -f publish=false` (manual release dry-run check)
 
 ## Pull Request Rules
 
