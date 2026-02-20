@@ -5,6 +5,12 @@ on:
     types:
       - published
   workflow_dispatch:
+    inputs:
+      publish:
+        description: "Actually publish to npm"
+        type: boolean
+        required: true
+        default: false
 
 permissions:
   contents: read
@@ -37,6 +43,11 @@ jobs:
         run: npm pack --dry-run
 
       - name: Publish to npm
+        if: ${{ github.event_name == 'release' || inputs.publish }}
         run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish skipped (dry run mode)
+        if: ${{ github.event_name == 'workflow_dispatch' && !inputs.publish }}
+        run: echo "publish=false, skipping npm publish step"
