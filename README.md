@@ -99,3 +99,7 @@ See `CONTRIBUTING.md`.
 ## Security
 
 See `SECURITY.md`.
+
+## Growth Plan
+
+See `docs/GROWTH_PLAYBOOK.md`.
