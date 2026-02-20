@@ -2,10 +2,38 @@ import { readFileSync } from "node:fs";
 import { BackupManager } from "./backup/backup-manager.js";
 import { UiPatcher } from "./patcher/ui-patcher.js";
 import { HookInjector } from "./patcher/hook-injector.js";
-import {
-  VersionCompatibility,
-  type PatchSignature,
-} from "./version/compatibility.js";
+import { VersionCompatibility } from "./version/compatibility.js";
+
+function isNativeExecutable(content: Buffer): boolean {
+  if (content.length < 4) return false;
+
+  const be = content.readUInt32BE(0);
+  const le = content.readUInt32LE(0);
+
+  // Mach-O (macOS) / Fat binary
+  if (
+    be === 0xfeedfacf ||
+    be === 0xfeedface ||
+    be === 0xcafebabe ||
+    le === 0xfeedfacf ||
+    le === 0xfeedface ||
+    le === 0xbebafeca
+  ) {
+    return true;
+  }
+
+  // ELF (Linux)
+  if (be === 0x7f454c46) {
+    return true;
+  }
+
+  // PE/COFF (Windows): "MZ"
+  if (content[0] === 0x4d && content[1] === 0x5a) {
+    return true;
+  }
+
+  return false;
+}
 
 export interface OrchestratorConfig {
   signaturesDir: string;
@@ -60,6 +88,14 @@ export class Orchestrator {
 
     // Read target file
     const content = readFileSync(targetPath);
+
+    if (isNativeExecutable(content)) {
+      return {
+        success: false,
+        error:
+          "Native executable target detected. Binary patching is disabled for safety because it can corrupt the executable and cause immediate process termination. Run uninstall if needed, then use a JavaScript CLI target.",
+      };
+    }
 
     // Check if file is already patched (patterns already replaced)
     if (this.patcher.isPatched(content, signature.patches)) {

@@ -65,6 +65,20 @@ export function buildCli(signaturesDir?: string): Command {
     logger.info(`Type: ${target.type} | Version: ${target.version ?? "unknown"}`);
     sessionLogger.log(`Found target: ${target.path} (${target.type}, v${target.version})`, "INSTALL");
 
+    if (target.type === "binary") {
+      logger.error(
+        "Native executable target detected. Binary patching is disabled for safety."
+      );
+      logger.info(
+        "Run 'bypass-permission-never-stop uninstall' if you previously patched this binary."
+      );
+      logger.info(
+        "Use a JavaScript Claude CLI target (for example npm global install) to patch safely."
+      );
+      sessionLogger.log("Native executable target blocked for safety", "INSTALL");
+      process.exit(1);
+    }
+
     // Install
     logger.info("Backing up original binary...");
     logger.info("Patching mode cycle array...");

@@ -218,7 +218,7 @@ describe("Integration: Full Install/Uninstall Flow", () => {
   });
 });
 
-describe("Integration: Binary Content Patching", () => {
+describe("Integration: Binary Content Safety", () => {
   let tempDir: string;
   let sigDir: string;
   let backupDir: string;
@@ -236,7 +236,7 @@ describe("Integration: Binary Content Patching", () => {
     rmSync(tempDir, { recursive: true, force: true });
   });
 
-  it("should handle binary data mixed with JS code", () => {
+  it("should refuse binary targets instead of patching them", () => {
     // Simulate a Bun-compiled binary with JS embedded
     const binaryPrefix = Buffer.alloc(100, 0x00);
     binaryPrefix.writeUInt32BE(0xfeedfacf, 0); // Mach-O magic
@@ -267,12 +267,12 @@ describe("Integration: Binary Content Patching", () => {
 
     const orch = new Orchestrator({ signaturesDir: sigDir, backupDir, logDir });
     const result = orch.install(targetPath, null);
-    expect(result.success).toBe(true);
+    expect(result.success).toBe(false);
+    expect(result.error).toContain("Native executable target detected");
 
-    // Verify binary prefix/suffix are intact
-    const patched = readFileSync(targetPath);
-    expect(patched.readUInt32BE(0)).toBe(0xfeedfacf);
-    expect(patched[patched.length - 1]).toBe(0xff);
-    expect(patched.toString("utf-8")).toContain('return"neverStop"');
+    // Verify binary remains untouched
+    const after = readFileSync(targetPath);
+    expect(after.equals(content)).toBe(true);
+    expect(existsSync(join(backupDir, "manifest.json"))).toBe(false);
   });
 });

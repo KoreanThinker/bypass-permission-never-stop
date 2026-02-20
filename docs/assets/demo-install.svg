@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="420" viewBox="0 0 980 420" role="img" aria-label="Install demo terminal output">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#13213a"/>
+      <stop offset="100%" stop-color="#0a1428"/>
+    </linearGradient>
+  </defs>
+  <rect width="980" height="420" fill="url(#bg)"/>
+  <rect x="0" y="0" width="980" height="36" fill="#0d1a30"/>
+  <circle cx="24" cy="18" r="6" fill="#ff6b6b"/>
+  <circle cx="44" cy="18" r="6" fill="#ffd166"/>
+  <circle cx="64" cy="18" r="6" fill="#5be37d"/>
+  <text x="86" y="23" fill="#9db0d8" font-family="monospace" font-size="14">demo-install.sh</text>
+
+  <g fill="#cbe1ff" font-family="monospace" font-size="18">
+    <text x="28" y="76">$ npx bypass-permission-never-stop</text>
+    <text x="28" y="116">[*] Scanning for Claude Code installation...</text>
+    <text x="28" y="152">[+] Found: ~/.local/share/claude/versions/2.1.39</text>
+    <text x="28" y="188">[*] Backing up original binary...</text>
+    <text x="28" y="224">[*] Patching mode cycle array...</text>
+    <text x="28" y="260">[*] Injecting never-stop hook...</text>
+    <text x="28" y="296">[+] Patch applied successfully (7 patches).</text>
+    <text x="28" y="332">[+] Run 'claude' and hit Shift+Tab to find 'Never Stop' mode.</text>
+  </g>
+</svg>

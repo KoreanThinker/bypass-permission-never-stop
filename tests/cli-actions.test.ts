@@ -70,7 +70,7 @@ describe("CLI actions", () => {
 
   it("runs install action successfully", async () => {
     const { buildCli, logger, sessionLog, orch } = await setupCliScenario({
-      target: { path: "/tmp/claude", type: "binary", version: "2.1.39" },
+      target: { path: "/tmp/claude.js", type: "js", version: "2.1.39" },
       installResult: { success: true, patchedCount: 3 },
     });
     const cli = buildCli("/tmp/signatures");
@@ -80,9 +80,27 @@ describe("CLI actions", () => {
     expect(logger.banner).toHaveBeenCalled();
     expect(logger.costWarning).toHaveBeenCalled();
     expect(logger.info).toHaveBeenCalledWith("Starting install flow...");
-    expect(orch.install).toHaveBeenCalledWith("/tmp/claude", "2.1.39");
+    expect(orch.install).toHaveBeenCalledWith("/tmp/claude.js", "2.1.39");
     expect(sessionLog).toHaveBeenCalledWith("Install started", "INSTALL");
     expect(exitSpy).not.toHaveBeenCalled();
+  });
+
+  it("exits early for native executable targets", async () => {
+    const { buildCli, logger, sessionLog, orch } = await setupCliScenario({
+      target: { path: "/tmp/claude", type: "binary", version: "2.1.39" },
+    });
+    const cli = buildCli("/tmp/signatures");
+
+    await expect(cli.parseAsync(["node", "cmd"], { from: "node" })).rejects.toThrow("EXIT:1");
+
+    expect(logger.error).toHaveBeenCalledWith(
+      "Native executable target detected. Binary patching is disabled for safety."
+    );
+    expect(sessionLog).toHaveBeenCalledWith(
+      "Native executable target blocked for safety",
+      "INSTALL"
+    );
+    expect(orch.install).not.toHaveBeenCalled();
   });
 
   it("exits when target is already patched", async () => {
@@ -112,7 +130,7 @@ describe("CLI actions", () => {
 
   it("exits with supported versions when install fails", async () => {
     const { buildCli, logger, orch } = await setupCliScenario({
-      target: { path: "/tmp/claude", type: "binary", version: "2.1.39" },
+      target: { path: "/tmp/claude.js", type: "js", version: "2.1.39" },
       installResult: { success: false, error: "patch fail" },
       supportedVersions: ["2.1.x", "2.2.x"],
     });

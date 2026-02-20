@@ -46,6 +46,44 @@ H=$(mktemp -d)
 HOME="$H" npx -y bypass-permission-never-stop --help
 ```
 
+## `claude` exits immediately with `killed`
+
+Symptom:
+
+```text
+[1] 12345 killed     claude
+```
+
+Fix:
+
+1. Restore from backup:
+
+```bash
+npx bypass-permission-never-stop uninstall
+```
+
+2. Verify Claude itself is healthy:
+
+```bash
+claude --version
+```
+
+3. If install reports `Native executable target detected`, do not patch that binary.
+Use a JavaScript CLI install target instead.
+
+## `Native executable target detected` during install
+
+Cause:
+
+- Your Claude target is a native executable (Mach-O/ELF/PE).
+- In-place string patching can corrupt executable layout and make `claude` fail to start.
+
+Fix:
+
+- Keep native binary unmodified.
+- Run `uninstall` if you previously patched it.
+- Use a JavaScript CLI target when available.
+
 ## Patch fails with missing patterns
 
 Symptom:

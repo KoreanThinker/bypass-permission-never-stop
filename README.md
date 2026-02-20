@@ -1,6 +1,7 @@
 # bypass-permission-never-stop
 
 [![npm version](https://img.shields.io/npm/v/bypass-permission-never-stop)](https://www.npmjs.com/package/bypass-permission-never-stop)
+[![npm downloads/week](https://img.shields.io/npm/dw/bypass-permission-never-stop)](https://www.npmjs.com/package/bypass-permission-never-stop)
 [![GitHub stars](https://img.shields.io/github/stars/KoreanThinker/bypass-permission-never-stop?style=social)](https://github.com/KoreanThinker/bypass-permission-never-stop/stargazers)
 [![CI](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/ci.yml/badge.svg)](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/ci.yml)
 [![Security Scan](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/security.yml/badge.svg)](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/security.yml)
@@ -10,7 +11,7 @@ Unofficial Claude Code runtime patcher that injects a `neverStop` mode into the 
 ## Disclaimer
 
 This project is **not** affiliated with Anthropic.
-It patches installed Claude Code binaries/runtime files and may violate product terms.
+It patches Claude Code JavaScript runtime files and may violate product terms.
 Use at your own risk.
 
 ## Quick Start
@@ -25,6 +26,9 @@ Restore original binary:
 npx bypass-permission-never-stop uninstall
 ```
 
+If your Claude installation is a native executable (`~/.local/share/claude/versions/*` Mach-O/ELF/PE),
+the tool now blocks patching for safety.
+
 ## Command Examples
 
 Patch installed Claude Code:
@@ -32,6 +36,8 @@ Patch installed Claude Code:
 ```bash
 npx bypass-permission-never-stop
 ```
+
+Note: native executable targets are blocked for safety.
 
 Rollback to original binary:
 
@@ -50,6 +56,7 @@ node dist/cli.js uninstall
 ## Features
 
 - One-command install patch flow
+- Native executable safety guard (prevents corrupting Claude binary)
 - `neverStop` mode added to mode cycle / mode label paths
 - Hook injection that replays the last user message in never-stop mode
 - Circuit-breaker guard for repeated error loops
@@ -66,6 +73,16 @@ node dist/cli.js uninstall
 [*] Injecting never-stop hook...
 [+] Patch applied successfully.
 ```
+
+## Demo Assets
+
+Install flow:
+
+![Install demo output](docs/assets/demo-install.svg)
+
+Uninstall flow:
+
+![Uninstall demo output](docs/assets/demo-uninstall.svg)
 
 ## Development
 
@@ -186,4 +203,13 @@ Run:
 
 ```bash
 npx bypass-permission-never-stop uninstall
+```
+
+### `claude` was getting killed immediately after patching. What should I do?
+
+Run rollback first, then verify:
+
+```bash
+npx bypass-permission-never-stop uninstall
+claude --version
 ```

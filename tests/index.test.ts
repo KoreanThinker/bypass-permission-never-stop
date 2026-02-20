@@ -100,6 +100,35 @@ describe("Orchestrator", () => {
       expect(manifest.originalPath).toBe(targetPath);
     });
 
+    it("should refuse native executable targets to avoid corruption", () => {
+      const targetPath = join(tempDir, "claude-native");
+      const nativeLike = Buffer.concat([
+        Buffer.from([0xfe, 0xed, 0xfa, 0xcf]), // Mach-O magic
+        Buffer.from('case"bypassPermissions":return"default"', "utf-8"),
+      ]);
+      writeFileSync(targetPath, nativeLike);
+
+      writeSignature([
+        {
+          id: "mode-cycle",
+          search: 'case"bypassPermissions":return"default"',
+          replace: 'case"bypassPermissions":return"neverStop"',
+        },
+      ]);
+
+      const orch = new Orchestrator({
+        signaturesDir: sigDir,
+        backupDir,
+        logDir,
+      });
+      const result = orch.install(targetPath, null);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain("Native executable target detected");
+      expect(readFileSync(targetPath).equals(nativeLike)).toBe(true);
+      expect(existsSync(join(backupDir, "manifest.json"))).toBe(false);
+    });
+
     it("should fail when no signature matches", () => {
       const targetPath = createFakeTarget("some content");
       // No signature files at all (empty dir)

@@ -20,3 +20,9 @@
 # Demo
 
 Paste short CLI output snippet showing install + uninstall flow.
+
+# Contributor Spotlight
+
+- First-time contributors merged this cycle:
+- Notable community PRs:
+- Thank-you notes:

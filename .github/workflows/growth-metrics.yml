@@ -18,9 +18,23 @@ jobs:
             const stars = repoInfo.data.stargazers_count;
             const forks = repoInfo.data.forks_count;
             const watchers = repoInfo.data.subscribers_count;
+            const pkg = "bypass-permission-never-stop";
+
+            let downloadsWeekly = "n/a";
+            try {
+              const resp = await fetch(`https://api.npmjs.org/downloads/point/last-week/${encodeURIComponent(pkg)}`);
+              if (resp.ok) {
+                const data = await resp.json();
+                downloadsWeekly = String(data.downloads ?? "n/a");
+              }
+            } catch (err) {
+              core.warning(`failed to fetch npm downloads: ${String(err)}`);
+            }
+
             core.summary
               .addHeading('Growth Metrics')
               .addRaw(`- Stars: ${stars}\n`)
               .addRaw(`- Forks: ${forks}\n`)
               .addRaw(`- Watchers: ${watchers}\n`)
+              .addRaw(`- npm downloads (last week): ${downloadsWeekly}\n`)
               .write();

@@ -61,6 +61,17 @@
         color: #cbe1ff;
       }
       .section { margin-top: 24px; }
+      .demo-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+      .demo-grid img {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: #0a1428;
+      }
       .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
       a.btn {
         display: inline-block;
@@ -95,6 +106,16 @@
         <div class="card">
           <h3>Rollback</h3>
           <pre><code>npx bypass-permission-never-stop uninstall</code></pre>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="card">
+          <h3>Demo Assets</h3>
+          <div class="demo-grid">
+            <img src="./assets/demo-install.svg" alt="Install flow demo output" />
+            <img src="./assets/demo-uninstall.svg" alt="Uninstall flow demo output" />
+          </div>
         </div>
       </div>
 
