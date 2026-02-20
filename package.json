@@ -1,6 +1,6 @@
 {
   "name": "bypass-permission-never-stop",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Bypass Permission Never Stop - Unofficial Claude Code God Mode Injector",
   "main": "dist/index.js",
   "bin": {
