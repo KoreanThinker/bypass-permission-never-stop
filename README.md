@@ -63,6 +63,10 @@ npm pack --dry-run
 
 - `NPM_TOKEN`: npm token with publish permission and 2FA bypass enabled
 
+### Recommended: npm Trusted Publishing
+
+If you configure npm Trusted Publishing for this repository, you can remove long-lived publish tokens and rely on GitHub OIDC.
+
 ### Release Flow
 
 1. Push changes to `main`
