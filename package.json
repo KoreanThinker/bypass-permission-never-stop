@@ -1,10 +1,10 @@
 {
-  "name": "claude-never-stop",
+  "name": "bypass-permission-never-stop",
   "version": "0.1.0",
   "description": "Bypass Permission Never Stop - Unofficial Claude Code God Mode Injector",
   "main": "dist/index.js",
   "bin": {
-    "claude-never-stop": "./dist/cli.js"
+    "bypass-permission-never-stop": "./dist/cli.js"
   },
   "scripts": {
     "build": "tsc",
@@ -19,12 +19,13 @@
     "god-mode",
     "automation",
     "never-stop",
-    "jailbreak"
+    "hack"
   ],
   "author": "hyun",
   "license": "MIT",
   "files": [
-    "dist/"
+    "dist/",
+    "signatures/"
   ],
   "engines": {
     "node": ">=18.0.0"
@@ -37,8 +38,6 @@
   },
   "dependencies": {
     "chalk": "^5.4.0",
-    "ora": "^8.0.0",
-    "boxen": "^8.0.0",
     "commander": "^13.0.0"
   }
 }

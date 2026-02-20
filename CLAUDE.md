@@ -1,21 +1,23 @@
 # CLAUDE.md
 
-## Project: bypass-permission-never-stop (claude-never-stop)
+## Project: bypass-permission-never-stop
 
 Unofficial Claude Code "God Mode" injector that monkey-patches the installed
-Claude Code binary to add a "bypass permission never stop" mode to the
-Shift+Tab permission cycle.
+Claude Code `cli.mjs` binary to add a "bypass permission never stop" mode to
+the Shift+Tab permission cycle.
 
 ## Tech Stack
 - TypeScript (Node16 module resolution)
 - Vitest for testing
-- chalk/ora/boxen for terminal UI
+- chalk for terminal output
 
 ## Architecture
-- `src/finder/` - Phase 1: Locate Claude Code installation on disk
-- `src/patcher/` - Phase 2 & 3: UI mode injection + never-stop hook
-- `src/backup/` - Phase 4: Backup/restore mechanism
-- `src/utils/` - Shared utilities (logger, circuit breaker, file scanner)
+- `src/finder/` - Phase 1: Locate Claude Code `cli.mjs` on disk
+- `src/patcher/` - Phase 2 & 3: UI mode injection + never-stop hook (message re-injection)
+- `src/backup/` - Phase 4: Backup/restore mechanism (latest 1 only)
+- `src/version/` - Phase 5: Version detection + signature matching
+- `src/utils/` - Shared utilities (logger, circuit breaker, session logger)
+- `signatures/` - Version-specific patch pattern signatures (manually maintained)
 
 ## Commands
 - `npm run build` - Compile TypeScript
@@ -25,5 +27,10 @@ Shift+Tab permission cycle.
 
 ## Key Conventions
 - All imports use `.js` extensions (Node16 module resolution)
-- Backups stored in `~/.claude-never-stop/backups/`
-- Never fork Claude Code - always monkey-patch the installed version
+- Backups stored in `~/.claude-never-stop/backups/` (latest 1 only)
+- Session logs in `~/.claude-never-stop/logs/` (plain text .log)
+- Never fork Claude Code - always monkey-patch the installed `cli.mjs`
+- Patch target is a single 22MB minified `cli.mjs` file
+- CLI has no subcommand for install (default action), `uninstall` for rollback
+- Logger style: hacker log `[*] Scanning... [+] Done.`
+- Circuit breaker: exact string match, 5 consecutive identical errors
