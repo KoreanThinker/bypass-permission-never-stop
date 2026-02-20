@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { buildCli, getDefaultPaths } from "../src/cli.js";
+import { buildCli, getDefaultPaths, getCliVersion } from "../src/cli.js";
 import {
   mkdtempSync,
+  readFileSync,
   writeFileSync,
   mkdirSync,
   rmSync,
@@ -37,11 +38,19 @@ describe("buildCli", () => {
     const cli = buildCli(sigDir);
     expect(cli).toBeDefined();
     expect(cli.name()).toBe("bypass-permission-never-stop");
+    const pkg = JSON.parse(readFileSync(join(__dirname, "..", "package.json"), "utf-8"));
+    expect(cli.version()).toBe(pkg.version);
   });
 
   it("should have uninstall command", () => {
     const cli = buildCli(sigDir);
     const commands = cli.commands.map((c) => c.name());
     expect(commands).toContain("uninstall");
+  });
+
+  it("should resolve CLI version from package.json", () => {
+    const version = getCliVersion();
+    const pkg = JSON.parse(readFileSync(join(__dirname, "..", "package.json"), "utf-8"));
+    expect(version).toBe(pkg.version);
   });
 });

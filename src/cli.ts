@@ -2,7 +2,7 @@
 import { Command } from "commander";
 import { join } from "node:path";
 import { homedir } from "node:os";
-import { realpathSync } from "node:fs";
+import { readFileSync, realpathSync } from "node:fs";
 import { Orchestrator } from "./index.js";
 import { findClaudeCodeTarget } from "./finder/target-finder.js";
 import { Logger } from "./utils/logger.js";
@@ -17,6 +17,21 @@ export function getDefaultPaths() {
   };
 }
 
+export function getCliVersion(): string {
+  try {
+    const packageJsonPath = join(__dirname, "..", "package.json");
+    const pkg = JSON.parse(readFileSync(packageJsonPath, "utf-8")) as {
+      version?: unknown;
+    };
+    if (typeof pkg.version === "string" && pkg.version.length > 0) {
+      return pkg.version;
+    }
+  } catch {
+    // fall through to safe default
+  }
+  return "0.0.0";
+}
+
 export function buildCli(signaturesDir?: string): Command {
   const program = new Command();
   const logger = new Logger();
@@ -26,7 +41,7 @@ export function buildCli(signaturesDir?: string): Command {
   program
     .name("bypass-permission-never-stop")
     .description("Unofficial Claude Code God Mode Injector")
-    .version("0.1.0");
+    .version(getCliVersion());
 
   // Default action: install
   program.action(async () => {

@@ -4,6 +4,13 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-02-20
+
+### Fixed
+
+- Corrected CLI version reporting to read from `package.json` instead of a hardcoded string.
+- Added regression tests to keep `--version` aligned with published package version.
+
 ## [0.1.2] - 2026-02-20
 
 ### Changed
