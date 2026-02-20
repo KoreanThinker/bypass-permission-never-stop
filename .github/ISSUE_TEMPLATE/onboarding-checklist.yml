@@ -1,0 +1,44 @@
+name: Contributor Onboarding Checklist
+description: Guided checklist for first-time contributors
+title: "[Onboarding]: "
+labels:
+  - growth
+  - good-first-issue
+body:
+  - type: markdown
+    attributes:
+      value: "Use this checklist to start your first contribution quickly."
+
+  - type: checkboxes
+    id: setup
+    attributes:
+      label: Local Setup
+      options:
+        - label: I cloned the repository
+        - label: I ran `npm install`
+        - label: I ran `npm run build`
+        - label: I ran `npm run test:ci`
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope Definition
+      options:
+        - label: I selected one focused issue
+        - label: I can explain the expected behavior change
+        - label: I identified files to update
+
+  - type: checkboxes
+    id: quality
+    attributes:
+      label: Quality Checks
+      options:
+        - label: I added/updated tests where needed
+        - label: I verified coverage gate still passes
+        - label: I confirmed no secrets are committed
+
+  - type: textarea
+    id: blockers
+    attributes:
+      label: Blockers
+      description: List blockers if you need maintainer help.

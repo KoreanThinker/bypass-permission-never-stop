@@ -133,6 +133,10 @@ See `SECURITY.md`.
 
 See `docs/GROWTH_PLAYBOOK.md`.
 
+## Landing Page
+
+See `docs/index.html` (GitHub Pages-ready static entry).
+
 ## Troubleshooting
 
 See `docs/TROUBLESHOOTING.md`.
@@ -152,6 +156,10 @@ See `CHANGELOG.md`.
 ## Architecture
 
 See `docs/ARCHITECTURE.md`.
+
+## Social Templates
+
+See `docs/SOCIAL_POST_TEMPLATES.md`.
 
 ## FAQ
 

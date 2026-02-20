@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>bypass-permission-never-stop</title>
+    <style>
+      :root {
+        --bg: #0b1220;
+        --bg-soft: #111a2e;
+        --text: #e5edff;
+        --muted: #9db0d8;
+        --accent: #62f3a6;
+        --accent-2: #7dc9ff;
+        --card: #131f36;
+        --border: #28406d;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+        background: radial-gradient(1000px 600px at 80% -10%, #17305e 0%, transparent 60%),
+                    radial-gradient(900px 500px at -20% 110%, #0f3d3f 0%, transparent 60%),
+                    var(--bg);
+        color: var(--text);
+      }
+      .wrap { max-width: 960px; margin: 0 auto; padding: 56px 20px 72px; }
+      h1 { margin: 0 0 8px; font-size: 42px; line-height: 1.1; letter-spacing: -0.02em; }
+      .sub { color: var(--muted); font-size: 18px; margin-bottom: 28px; }
+      .badge {
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 700;
+        color: #04241c;
+        background: var(--accent);
+        border-radius: 999px;
+        padding: 6px 10px;
+        margin-bottom: 16px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+        margin: 20px 0 28px;
+      }
+      .card {
+        background: linear-gradient(180deg, #162744 0%, var(--card) 100%);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+      }
+      .card h3 { margin: 0 0 10px; font-size: 16px; }
+      .card p { margin: 0; color: var(--muted); line-height: 1.5; }
+      pre {
+        margin: 0;
+        padding: 14px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: #0a1428;
+        overflow-x: auto;
+        color: #cbe1ff;
+      }
+      .section { margin-top: 24px; }
+      .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+      a.btn {
+        display: inline-block;
+        border: 1px solid var(--border);
+        background: var(--bg-soft);
+        color: var(--text);
+        text-decoration: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-weight: 600;
+      }
+      a.btn.primary {
+        border-color: #32d58f;
+        background: linear-gradient(180deg, #2de49a 0%, #20ba7c 100%);
+        color: #05281e;
+      }
+      footer { margin-top: 26px; color: var(--muted); font-size: 13px; }
+      code { font-family: "IBM Plex Mono", "SFMono-Regular", ui-monospace, monospace; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="badge">Unofficial Runtime Patcher</div>
+      <h1>bypass-permission-never-stop</h1>
+      <div class="sub">Injects <code>neverStop</code> mode into Claude Code's mode cycle with backup/restore safety.</div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Quick Start</h3>
+          <pre><code>npx bypass-permission-never-stop</code></pre>
+        </div>
+        <div class="card">
+          <h3>Rollback</h3>
+          <pre><code>npx bypass-permission-never-stop uninstall</code></pre>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="card">
+          <h3>Sample Output</h3>
+          <pre><code>[*] Scanning for Claude Code installation...
+[+] Found: ~/.local/share/claude/versions/2.1.39
+[*] Backing up original binary...
+[*] Patching mode cycle array...
+[*] Injecting never-stop hook...
+[+] Patch applied successfully.</code></pre>
+        </div>
+      </div>
+
+      <div class="links">
+        <a class="btn primary" href="https://github.com/KoreanThinker/bypass-permission-never-stop">GitHub Repository</a>
+        <a class="btn" href="./PRD.md">PRD</a>
+        <a class="btn" href="./TROUBLESHOOTING.md">Troubleshooting</a>
+        <a class="btn" href="./TRUSTED_PUBLISHING.md">Trusted Publishing</a>
+        <a class="btn" href="./GROWTH_PLAYBOOK.md">Growth Playbook</a>
+      </div>
+
+      <footer>
+        This project is not affiliated with Anthropic. Use at your own risk.
+      </footer>
+    </div>
+  </body>
+</html>
