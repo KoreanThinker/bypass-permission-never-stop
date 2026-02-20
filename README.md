@@ -49,6 +49,23 @@ npm test -- --coverage
 npm pack --dry-run
 ```
 
+## CI / CD
+
+- `CI`: runs build + coverage checks on push/PR
+- `Release`: runs build/test and publishes to npm when a GitHub Release is published
+- `Security Scan`: runs secret scanning on push/PR
+- `Dependabot`: weekly npm dependency update PRs
+
+### Required GitHub Secret
+
+- `NPM_TOKEN`: npm token with publish permission and 2FA bypass enabled
+
+### Release Flow
+
+1. Push changes to `main`
+2. Create/publish a GitHub Release (for example `v0.1.1`)
+3. `Release` workflow publishes package to npm automatically
+
 ## QA Baseline
 
 - Test framework: Vitest
