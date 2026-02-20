@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-02-20
+
+### Fixed
+
+- Improved pnpm detection when running from shells where `pnpm` is not on `PATH` (for example `bash`-only sessions).
+- Added fallback scanning for pnpm global store layout (`.../global/<version>/.pnpm/@anthropic-ai+claude-code@...`).
+- Added regression test for mixed environments where `which claude` resolves to native binary but pnpm JS package exists.
+
 ## [0.1.4] - 2026-02-20
 
 ### Fixed

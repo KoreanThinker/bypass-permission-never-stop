@@ -93,6 +93,51 @@ exit 1
     expect(target?.version).toBe("3.2.1");
   });
 
+  it("finds pnpm global store layout even when pnpm command is unavailable", async () => {
+    const versionsDir = join(tempDir, ".local", "share", "claude", "versions");
+    mkdirSync(versionsDir, { recursive: true });
+    writeMachOBinary(join(versionsDir, "2.1.39"));
+
+    const fakeBin = join(tempDir, "bin");
+    mkdirSync(fakeBin, { recursive: true });
+    process.env.PATH = fakeBin;
+
+    const pnpmVersionRoot = join(tempDir, "Library", "pnpm", "global", "5");
+    const pkgRoot = join(
+      pnpmVersionRoot,
+      ".pnpm",
+      "@anthropic-ai+claude-code@3.2.1",
+      "node_modules",
+      "@anthropic-ai",
+      "claude-code"
+    );
+    mkdirSync(pkgRoot, { recursive: true });
+    writeFileSync(join(pkgRoot, "package.json"), JSON.stringify({ version: "3.2.1" }), "utf-8");
+    writeFileSync(join(pkgRoot, "cli.mjs"), "// pnpm store cli\n", "utf-8");
+
+    // which resolves to local binary target
+    writeExecScript(
+      join(fakeBin, "which"),
+      `#!/bin/sh
+if [ "$1" = "claude" ]; then
+  echo "${join(versionsDir, "2.1.39")}"
+  exit 0
+fi
+exit 1
+`
+    );
+    // package-manager commands unavailable in this shell
+    writeExecScript(join(fakeBin, "npm"), "#!/bin/sh\nexit 1\n");
+    writeExecScript(join(fakeBin, "pnpm"), "#!/bin/sh\nexit 1\n");
+    writeExecScript(join(fakeBin, "yarn"), "#!/bin/sh\nexit 1\n");
+
+    const target = await findClaudeCodeTarget();
+    expect(target).not.toBeNull();
+    expect(target?.type).toBe("js");
+    expect(target?.path).toBe(join(pkgRoot, "cli.mjs"));
+    expect(target?.version).toBe("3.2.1");
+  });
+
   it("uses non-semver fallback entry when file is large enough", async () => {
     const versionsDir = join(tempDir, ".local", "share", "claude", "versions");
     mkdirSync(versionsDir, { recursive: true });

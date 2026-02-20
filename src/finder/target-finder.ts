@@ -72,6 +72,60 @@ export function resolveCliMjs(packageRoot: string): string | null {
   return null;
 }
 
+function resolvePackageTarget(packageRoot: string): ClaudeCodeTarget | null {
+  if (!existsSync(packageRoot)) return null;
+  const cliPath = resolveCliMjs(packageRoot);
+  if (!cliPath) return null;
+  const version = extractVersionFromPackageJson(packageRoot);
+  return { path: cliPath, type: "js", version };
+}
+
+function findClaudePackageInPnpmVersionRoot(versionRoot: string): ClaudeCodeTarget | null {
+  const direct = resolvePackageTarget(join(versionRoot, "node_modules", CLAUDE_PACKAGE));
+  if (direct) return direct;
+
+  const pnpmStore = join(versionRoot, ".pnpm");
+  if (!existsSync(pnpmStore)) return null;
+
+  try {
+    const entries = readdirSync(pnpmStore).filter((e) =>
+      e.startsWith("@anthropic-ai+claude-code@")
+    );
+    for (const entry of entries) {
+      const candidate = join(
+        pnpmStore,
+        entry,
+        "node_modules",
+        CLAUDE_PACKAGE
+      );
+      const target = resolvePackageTarget(candidate);
+      if (target) return target;
+    }
+  } catch {
+    // Ignore unreadable pnpm store paths.
+  }
+
+  return null;
+}
+
+function getKnownPnpmGlobalBases(): string[] {
+  const home = process.env.HOME || homedir() || "";
+  const result = new Set<string>();
+
+  if (home) {
+    result.add(join(home, "Library", "pnpm", "global"));
+    result.add(join(home, ".local", "share", "pnpm", "global"));
+  }
+
+  const pnpmHome = process.env.PNPM_HOME;
+  if (pnpmHome) {
+    result.add(join(pnpmHome, "global"));
+    result.add(join(dirname(pnpmHome), "global"));
+  }
+
+  return [...result];
+}
+
 export async function findClaudeCodeTarget(): Promise<ClaudeCodeTarget | null> {
   const strategies: Array<() => ClaudeCodeTarget | null> = [
     findViaLocalShare,
@@ -80,6 +134,7 @@ export async function findClaudeCodeTarget(): Promise<ClaudeCodeTarget | null> {
     findViaHomebrew,
     findViaVolta,
     findViaPnpmGlobal,
+    findViaKnownPnpmGlobalPaths,
     findViaYarnGlobal,
     findViaClaudeDir,
   ];
@@ -214,14 +269,7 @@ function findViaWhich(): ClaudeCodeTarget | null {
 function findViaNpmGlobal(): ClaudeCodeTarget | null {
   try {
     const globalRoot = execSync("npm root -g", { encoding: "utf-8" }).trim();
-    const candidate = join(globalRoot, CLAUDE_PACKAGE);
-    if (existsSync(candidate)) {
-      const cliPath = resolveCliMjs(candidate);
-      if (cliPath) {
-        const version = extractVersionFromPackageJson(candidate);
-        return { path: cliPath, type: "js", version };
-      }
-    }
+    return resolvePackageTarget(join(globalRoot, CLAUDE_PACKAGE));
   } catch {
     // npm not available
   }
@@ -235,14 +283,8 @@ function findViaHomebrew(): ClaudeCodeTarget | null {
   ];
 
   for (const basePath of paths) {
-    const candidate = join(basePath, CLAUDE_PACKAGE);
-    if (existsSync(candidate)) {
-      const cliPath = resolveCliMjs(candidate);
-      if (cliPath) {
-        const version = extractVersionFromPackageJson(candidate);
-        return { path: cliPath, type: "js", version };
-      }
-    }
+    const target = resolvePackageTarget(join(basePath, CLAUDE_PACKAGE));
+    if (target) return target;
   }
   return null;
 }
@@ -259,30 +301,48 @@ function findViaVolta(): ClaudeCodeTarget | null {
     "packages",
     CLAUDE_PACKAGE
   );
-  if (existsSync(voltaPath)) {
-    const cliPath = resolveCliMjs(voltaPath);
-    if (cliPath) {
-      const version = extractVersionFromPackageJson(voltaPath);
-      return { path: cliPath, type: "js", version };
-    }
-  }
-  return null;
+  return resolvePackageTarget(voltaPath);
 }
 
 function findViaPnpmGlobal(): ClaudeCodeTarget | null {
   try {
     const pnpmRoot = execSync("pnpm root -g", { encoding: "utf-8" }).trim();
-    const candidate = join(pnpmRoot, CLAUDE_PACKAGE);
-    if (existsSync(candidate)) {
-      const cliPath = resolveCliMjs(candidate);
-      if (cliPath) {
-        const version = extractVersionFromPackageJson(candidate);
-        return { path: cliPath, type: "js", version };
-      }
-    }
+    const direct = resolvePackageTarget(join(pnpmRoot, CLAUDE_PACKAGE));
+    if (direct) return direct;
+
+    const versionRoot = dirname(pnpmRoot);
+    return findClaudePackageInPnpmVersionRoot(versionRoot);
   } catch {
     // pnpm not available
   }
+  return null;
+}
+
+function findViaKnownPnpmGlobalPaths(): ClaudeCodeTarget | null {
+  const globalBases = getKnownPnpmGlobalBases();
+
+  for (const globalBase of globalBases) {
+    if (!existsSync(globalBase)) continue;
+
+    // Common layout: <base>/5/node_modules/...
+    try {
+      const versionDirs = readdirSync(globalBase)
+        .map((entry) => join(globalBase, entry))
+        .filter((entryPath) => existsSync(entryPath));
+
+      for (const versionRoot of versionDirs) {
+        const target = findClaudePackageInPnpmVersionRoot(versionRoot);
+        if (target) return target;
+      }
+    } catch {
+      // Ignore unreadable directories and continue.
+    }
+
+    // Fallback layout: <base>/node_modules/...
+    const direct = findClaudePackageInPnpmVersionRoot(globalBase);
+    if (direct) return direct;
+  }
+
   return null;
 }
 
@@ -291,14 +351,7 @@ function findViaYarnGlobal(): ClaudeCodeTarget | null {
     const yarnDir = execSync("yarn global dir", {
       encoding: "utf-8",
     }).trim();
-    const candidate = join(yarnDir, "node_modules", CLAUDE_PACKAGE);
-    if (existsSync(candidate)) {
-      const cliPath = resolveCliMjs(candidate);
-      if (cliPath) {
-        const version = extractVersionFromPackageJson(candidate);
-        return { path: cliPath, type: "js", version };
-      }
-    }
+    return resolvePackageTarget(join(yarnDir, "node_modules", CLAUDE_PACKAGE));
   } catch {
     // yarn not available
   }
