@@ -4,11 +4,17 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-02-20
+
 ### Fixed
 
 - Blocked native executable (Mach-O/ELF/PE) patch attempts to prevent `claude` startup failures (`killed`/SIGKILL).
 - Added CLI early-exit safety path for binary targets with recovery guidance.
 - Added regression tests for binary-target refusal and binary-corruption prevention.
+
+### Changed
+
+- Added ESLint v9 flat config and restored `npm run lint` execution.
 
 ## [0.1.0] - 2026-02-20
 
