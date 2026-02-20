@@ -1,5 +1,7 @@
 # bypass-permission-never-stop
 
+[![npm version](https://img.shields.io/npm/v/bypass-permission-never-stop)](https://www.npmjs.com/package/bypass-permission-never-stop)
+[![GitHub stars](https://img.shields.io/github/stars/KoreanThinker/bypass-permission-never-stop?style=social)](https://github.com/KoreanThinker/bypass-permission-never-stop/stargazers)
 [![CI](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/ci.yml/badge.svg)](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/ci.yml)
 [![Security Scan](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/security.yml/badge.svg)](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/security.yml)
 
@@ -83,6 +85,7 @@ scripts/smoke-published.sh
 - `Dependabot`: monthly npm dependency update PRs (non-major only)
 - `Smoke Published Package`: weekly + manual smoke test against npm package
 - `Growth Metrics`: weekly star/fork/watcher snapshot in workflow summary
+- `Pages`: deploys `docs/` to GitHub Pages on `main`
 
 ### Required GitHub Secret
 
@@ -136,6 +139,7 @@ See `docs/GROWTH_PLAYBOOK.md`.
 ## Landing Page
 
 See `docs/index.html` (GitHub Pages-ready static entry).
+Published URL: `https://koreanthinker.github.io/bypass-permission-never-stop/`
 
 ## Troubleshooting
 
@@ -160,6 +164,10 @@ See `docs/ARCHITECTURE.md`.
 ## Social Templates
 
 See `docs/SOCIAL_POST_TEMPLATES.md`.
+
+## Community Posting Checklist
+
+See `docs/COMMUNITY_POSTING_CHECKLIST.md`.
 
 ## FAQ
 
