@@ -40,5 +40,11 @@
 - [x] Add troubleshooting doc for npm/2FA/token errors
 - [x] Add end-to-end smoke test script for published package
 - [x] Add docs for Trusted Publishing setup
-- [ ] Add short demo output section per release
-- [ ] Add “good first issue” labeled tasks
+- [x] Add short demo output section per release
+- [x] Add “good first issue” labeled tasks
+
+## Next Backlog
+
+- [ ] Add a minimal landing page with install/demo section
+- [ ] Add release social-post template (X/Reddit/Dev.to)
+- [ ] Add contributor onboarding checklist issue template
