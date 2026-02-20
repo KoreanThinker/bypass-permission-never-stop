@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented in this file.
 
+## [Unreleased]
+
+### Fixed
+
+- Blocked native executable (Mach-O/ELF/PE) patch attempts to prevent `claude` startup failures (`killed`/SIGKILL).
+- Added CLI early-exit safety path for binary targets with recovery guidance.
+- Added regression tests for binary-target refusal and binary-corruption prevention.
+
 ## [0.1.0] - 2026-02-20
 
 ### Added
