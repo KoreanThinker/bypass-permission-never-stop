@@ -1,0 +1,26 @@
+{
+  "versionRange": "generic",
+  "minVersion": "0.0.0",
+  "maxVersion": "99.99.99",
+  "targetType": "binary",
+  "patches": [
+    {
+      "id": "mode-cycle-bypass-to-neverstop",
+      "description": "Change bypassPermissions -> default to bypassPermissions -> neverStop in mode cycle",
+      "search": "case\"bypassPermissions\":return\"default\"",
+      "replace": "case\"bypassPermissions\":return\"neverStop\""
+    },
+    {
+      "id": "mode-cycle-neverstop-to-default",
+      "description": "Add neverStop -> default case in mode cycle",
+      "search": "case\"dontAsk\":return\"default\"}}",
+      "replace": "case\"dontAsk\":return\"default\";case\"neverStop\":return\"default\"}}"
+    },
+    {
+      "id": "mode-display-name",
+      "description": "Add display name for neverStop mode",
+      "search": "case\"dontAsk\":return\"Don't Ask\"}}",
+      "replace": "case\"dontAsk\":return\"Don't Ask\";case\"neverStop\":return\"Never Stop\"}}"
+    }
+  ]
+}

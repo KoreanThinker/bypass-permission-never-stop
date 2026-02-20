@@ -50,47 +50,100 @@
 
 이 프로젝트는 Claude Code를 포크(Fork)하지 않는다. 대신, 유저 컴퓨터에 설치된 패키지를 찾아내서 코드를 덮어씌운다.
 
-### 타겟 파일 구조 (실제 분석 기반)
+### 타겟 파일 구조 (실제 리버스 엔지니어링 기반 — v2.1.39)
 
-Claude Code의 핵심 코드는 **`cli.mjs` 단일 파일 번들 (약 22MB)**로 패키징되어 있다.
-- 극도로 난독화(minified): 변수명 1~2글자 (`A`, `q`, `K`, `Y`)
-- `dist/` 디렉토리에 파일이 분산되어 있지 않음 — **단일 진입점**
-- 패치 대상은 이 `cli.mjs` 하나
+Claude Code v2.1.39부터 **Bun으로 컴파일된 Mach-O 64-bit arm64 바이너리 (~183MB)**로 배포된다.
+- 설치 위치: `~/.local/share/claude/versions/<version>` (단일 실행 파일)
+- 심볼릭 링크: `~/.local/bin/claude` → `~/.local/share/claude/versions/2.1.39`
+- JS 코드가 바이너리 안에 임베딩되어 있음 (Bun single-file executable)
+- 극도로 난독화(minified): 변수명 1~2글자 (`T`, `R`, `A`, `_`)
+- **패치 방법**: 바이너리 내부의 JS 문자열을 직접 바이너리 레벨에서 치환 (same-length replacement)
+- `package.json`이나 `cli.mjs` 파일이 별도로 존재하지 않음
+
+> **중요**: 바이너리 패치이므로 반드시 같은 길이의 문자열로 치환해야 한다. 길이가 달라지면 바이너리가 깨진다.
+
+#### RE 결과: 핵심 코드 패턴 (v2.1.39)
+
+**1. 모드 배열 (GAT)**:
+```javascript
+GAT=["acceptEdits","bypassPermissions","default","delegate","dontAsk","plan"]
+```
+
+**2. 모드 사이클 함수 (VNT)** — `Shift+Tab` 핸들러의 핵심:
+```javascript
+function VNT(T,R){
+  let A=n9()&&R&&IQ(R);
+  switch(T.mode){
+    case"default":return"acceptEdits";
+    case"acceptEdits":return"plan";
+    case"plan":
+      if(A)return"delegate";
+      if(T.isBypassPermissionsModeAvailable)return"bypassPermissions";
+      return"default";
+    case"delegate":
+      if(T.isBypassPermissionsModeAvailable)return"bypassPermissions";
+      return"default";
+    case"bypassPermissions":return"default";
+    case"dontAsk":return"default";
+  }
+}
+```
+
+**3. 모드 표시명 함수 (Qu)**:
+```javascript
+function Qu(T){switch(T){
+  case"default":return"Default";
+  case"plan":return"Plan Mode";
+  case"delegate":return"Delegate Mode";
+  case"acceptEdits":return"Accept edits";
+  case"bypassPermissions":return"Bypass Permissions";
+  case"dontAsk":return"Don't Ask";
+}}
+```
+
+**4. 메인 루프 (Pf)**: `async function*Pf(...)` — 에이전트 실행 루프
+- `stop_reason`이 `"end_turn"`이면 루프 종료
+- `stop_reason`이 `"tool_use"`이면 도구 실행 후 계속
+
+**5. 버전/빌드 정보**:
+```javascript
+{PACKAGE_URL:"@anthropic-ai/claude-code",VERSION:"2.1.39",BUILD_TIME:"2026-02-10T21:11:23Z"}
+```
 
 ### Phase 1: Target Finder (글로벌 패키지 추적기)
 
 유저 시스템에 설치된 Claude Code의 물리적 경로를 동적으로 탐색.
 
 **탐색 우선순위:**
-1. `which claude` → 심볼릭 링크 역추적으로 패키지 루트 탐색
-2. `npm root -g` → `@anthropic-ai/claude-code` 존재 여부 확인
-3. Homebrew 경로: `/opt/homebrew/lib/node_modules/`, `/usr/local/lib/node_modules/`
-4. Volta: `~/.volta/tools/image/packages/@anthropic-ai/claude-code/`
-5. pnpm: `pnpm root -g`
-6. yarn: `yarn global dir`
-7. Anthropic 공식 installer: `~/.claude/` 하위 탐색
+1. Anthropic 공식 installer: `~/.local/share/claude/versions/` (v2.1.x 기본 설치 경로)
+2. `which claude` → 심볼릭 링크 역추적으로 바이너리 경로 탐색
+3. `npm root -g` → `@anthropic-ai/claude-code` 존재 여부 확인 (레거시)
+4. Homebrew 경로: `/opt/homebrew/lib/node_modules/`, `/usr/local/lib/node_modules/` (레거시)
+5. Volta: `~/.volta/tools/image/packages/@anthropic-ai/claude-code/` (레거시)
+6. pnpm: `pnpm root -g` (레거시)
+7. yarn: `yarn global dir` (레거시)
 
-**출력:** `cli.mjs` 파일의 절대 경로
+**출력:** Claude Code 바이너리 또는 `cli.mjs` 파일의 절대 경로
+**판별:** 파일이 Mach-O 바이너리인지 JS 텍스트인지 자동 감지 (바이너리 패치 vs 텍스트 패치 분기)
 
 ### Phase 2: AST / Regex Patcher (UI 하이재킹)
 
 `cli.mjs`를 읽어들여 Shift+Tab 모드 사이클에 커스텀 모드를 주입.
 
-- **목표 1 (UI)**: 퍼미션 모드 사이클을 담당하는 코드 패턴을 정규식으로 탐색. 난독화된 코드에서 `permissionMode` 관련 상태 전환 로직을 찾아 `"bypass permission never stop"` 모드를 `bypassPermissions` 바로 다음(마지막)에 삽입.
-  - 모드 배열의 정확한 형태는 **버전별 코드 분석 후 확정** (난독화로 인해 고정 패턴 보장 불가)
-  - 패턴 매칭 실패 시 에러 출력 후 안전 종료 (패치 미적용)
-- **목표 2 (Logic)**: 해당 모드가 선택되었을 때 `bypassPermissions`와 동일한 권한 우회 플래그 활성화 + never-stop 플래그 추가 활성화.
+- **목표 1 (모드 사이클 패치)**: `VNT` 함수의 `case"bypassPermissions":return"default"` 를 `case"bypassPermissions":return"neverStop"` 로 바이너리 치환 (같은 길이). 그리고 `case"dontAsk":return"default"` 뒤에 `case"neverStop":return"default"` 를 추가.
+- **목표 2 (모드 표시명 패치)**: `Qu` 함수에 `case"neverStop":return"Never Stop"` 케이스 추가.
+- **목표 3 (GAT 배열 패치)**: `GAT` 배열에 `"neverStop"` 추가.
+- **중요**: 바이너리 패치이므로 **모든 치환은 반드시 동일한 바이트 길이**여야 한다. 길이가 다르면 바이너리가 깨진다.
+- 패턴 매칭 실패 시 에러 출력 + 지원 버전 목록 출력 후 안전 종료 (패치 미적용)
 
 ### Phase 3: Hook Injector (무한 루프 주입)
 
 `cli.mjs`에서 에이전트 종료/완료 로직을 찾아 덮어씌움 (Monkey Patch).
 
-- **Stop 차단 + 메시지 재주입**: `bypass permission never stop` 모드에서 Claude가 작업을 끝내려고 하면 Stop 이벤트를 차단하고, **유저가 직전에 입력한 메시지를 다시 주입**하여 새로운 루프를 강제 시작.
+- **Stop 차단 + 메시지 재주입**: `neverStop` 모드에서 `stop_reason`이 `"end_turn"`일 때, 에이전트 루프(`Pf` 함수)의 종료를 차단하고 유저가 직전에 입력한 메시지를 다시 주입하여 새로운 루프를 강제 시작.
 - 컨텍스트 윈도우 관리는 Claude Code의 기본 compact 메커니즘에 위임.
-- 난독화된 코드에서 Stop 관련 함수 식별 전략:
-  - `stop`, `complete`, `finish`, `done` 등의 문자열 패턴 탐색
-  - 에이전트 루프의 종료 조건 분기점 탐색
-  - 패턴 매칭 실패 시 에러 출력 후 안전 종료
+- **RE 기반 구현**: 메인 루프(`Pf`)에서 `stop_reason` 체크 후 `"end_turn"` 분기에 조건 삽입 — 현재 모드가 `neverStop`이면 직전 유저 메시지를 메시지 배열에 다시 push하고 루프 계속.
+- 패턴 매칭 실패 시 에러 출력 후 안전 종료
 
 ### Phase 4: Auto-Restorer (복구/롤백 메커니즘)
 
@@ -103,7 +156,7 @@ Claude Code의 핵심 코드는 **`cli.mjs` 단일 파일 번들 (약 22MB)**로
 
 Claude Code는 빠르게 업데이트되며 (현재 v2.1.39), 난독화된 번들은 **업데이트마다 내부 구조가 변경**될 수 있다.
 
-- **버전 감지**: 패치 전 `package.json`에서 Claude Code 버전 확인
+- **버전 감지**: 바이너리 내부의 `VERSION:"x.y.z"` 문자열에서 Claude Code 버전 추출 (package.json 없음)
 - **패턴 시그니처 DB**: 버전별 패치 대상 정규식 패턴을 매핑 테이블로 관리 (**수동 유지**)
   ```
   signatures/
@@ -186,13 +239,13 @@ bypass-permission-never-stop/
 
 | Phase | 내용 | 상태 |
 |-------|------|------|
-| Phase 0 | Claude Code `cli.mjs` 리버스 엔지니어링 (모드 배열, Stop 로직 위치 확정) | TODO |
-| Phase 1 | Target Finder - Claude Code 설치 경로 탐색 | TODO |
+| Phase 0 | Claude Code 바이너리 리버스 엔지니어링 (모드 배열, Stop 로직 위치 확정) | DONE |
+| Phase 1 | Target Finder - Claude Code 설치 경로 탐색 | DONE |
 | Phase 2 | UI Patcher - Shift+Tab 모드 배열 주입 (bypassPermissions 다음) | TODO |
 | Phase 3 | Hook Injector - 무한 루프 로직 주입 + 직전 메시지 재주입 | TODO |
-| Phase 4 | Backup Manager - 백업/롤백 메커니즘 (최신 1개) | TODO |
-| Phase 5 | Version Compatibility - 버전 감지 및 시그니처 관리 (수동) | TODO |
+| Phase 4 | Backup Manager - 백업/롤백 메커니즘 (최신 1개) | DONE |
+| Phase 5 | Version Compatibility - 버전 감지 및 시그니처 매칭 (수동) | TODO |
 | Phase 6 | CLI & 해커 로그 UI | TODO |
 | Phase 7 | 테스트 & NPM + GitHub Releases 배포 | TODO |
 
-> **Phase 0가 가장 중요하다.** 난독화된 22MB `cli.mjs`에서 모드 배열과 Stop 로직의 정확한 위치/패턴을 찾아내는 리버스 엔지니어링이 전체 프로젝트의 성패를 결정한다. 이 Phase가 실패하면 나머지는 의미가 없다.
+> **Phase 0 완료.** v2.1.39 Bun-compiled 바이너리(183MB)의 내부 구조를 성공적으로 리버스 엔지니어링했다. 모드 사이클 함수(`VNT`), 모드 배열(`GAT`), 표시명 함수(`Qu`), 메인 루프(`Pf`), 버전 정보 위치를 모두 확인했다.
