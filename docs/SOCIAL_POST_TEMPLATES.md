@@ -17,7 +17,7 @@
 
 Title:
 
-`I built an unofficial Claude Code runtime patcher with backup/restore safety and CI-gated releases`
+`I built a Claude Code runtime patcher with backup/restore safety and CI-gated releases`
 
 Body:
 

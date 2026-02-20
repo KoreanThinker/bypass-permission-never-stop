@@ -83,7 +83,7 @@ export function buildCli(signaturesDir?: string, options?: CliBuildOptions): Com
 
   program
     .name("bypass-permission-never-stop")
-    .description("Install never-stop mode for Claude Code (unofficial)")
+    .description("Install never-stop mode for Claude Code")
     .version(getCliVersion());
 
   program.option("-y, --yes", "Skip install confirmation prompt");

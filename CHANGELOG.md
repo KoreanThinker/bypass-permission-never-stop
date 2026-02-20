@@ -4,6 +4,19 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.10] - 2026-02-20
+
+### Changed
+
+- Removed the previous legacy labeling across user-facing surfaces.
+- Updated CLI description/banner copy to neutral wording.
+- Updated README, docs landing page, social templates, and project metadata wording for consistent tone.
+
+### QA
+
+- Verified the previous legacy label string no longer appears in repository search.
+- Verified CLI/test surfaces remain green after wording changes.
+
 ## [0.1.9] - 2026-02-20
 
 ### Changed

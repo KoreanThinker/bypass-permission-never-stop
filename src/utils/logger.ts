@@ -20,7 +20,7 @@ export class Logger {
       `\x1b[36m
   ┌──────────────────────────────────────────────────┐
   │ bypass-permission-never-stop                    │
-  │ Claude Code never-stop installer (unofficial)   │
+  │ Claude Code never-stop installer                 │
   └──────────────────────────────────────────────────┘
 \x1b[0m\n`
     );

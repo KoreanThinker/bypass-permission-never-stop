@@ -2,7 +2,7 @@
 
 ## Project: bypass-permission-never-stop
 
-Unofficial Claude Code runtime patcher that injects a "neverStop" mode into
+Claude Code runtime patcher that injects a "neverStop" mode into
 Claude Code mode flow.
 
 ## Tech Stack
