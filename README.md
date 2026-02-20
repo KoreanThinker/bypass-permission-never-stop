@@ -23,6 +23,28 @@ Restore original binary:
 npx bypass-permission-never-stop uninstall
 ```
 
+## Command Examples
+
+Patch installed Claude Code:
+
+```bash
+npx bypass-permission-never-stop
+```
+
+Rollback to original binary:
+
+```bash
+npx bypass-permission-never-stop uninstall
+```
+
+Run local build directly:
+
+```bash
+npm run build
+node dist/cli.js
+node dist/cli.js uninstall
+```
+
 ## Features
 
 - One-command install patch flow
@@ -122,3 +144,22 @@ See `.github/RELEASE_TEMPLATE.md`.
 ## Changelog
 
 See `CHANGELOG.md`.
+
+## FAQ
+
+### Is this an official Anthropic tool?
+
+No. This is an unofficial runtime patcher.
+
+### Why does publish fail with npm E403 + 2FA message?
+
+Your publish token likely does not have 2FA bypass permission.
+See `docs/TROUBLESHOOTING.md`.
+
+### How do I safely rollback?
+
+Run:
+
+```bash
+npx bypass-permission-never-stop uninstall
+```
