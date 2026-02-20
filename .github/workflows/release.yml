@@ -42,15 +42,17 @@ jobs:
       - name: Package dry-run
         run: npm pack --dry-run
 
-      - name: Publish to npm (token mode)
-        if: ${{ (github.event_name == 'release' || inputs.publish) && secrets.NPM_TOKEN != '' }}
-        run: npm publish --access public --provenance
+      - name: Publish to npm (auto mode)
+        if: ${{ github.event_name == 'release' || inputs.publish }}
+        run: |
+          if [ -n "${NODE_AUTH_TOKEN:-}" ]; then
+            echo "Using token-based publish mode"
+          else
+            echo "Using trusted publishing mode"
+          fi
+          npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish to npm (trusted publishing mode)
-        if: ${{ (github.event_name == 'release' || inputs.publish) && secrets.NPM_TOKEN == '' }}
-        run: npm publish --access public --provenance
 
       - name: Publish skipped (dry run mode)
         if: ${{ github.event_name == 'workflow_dispatch' && !inputs.publish }}
