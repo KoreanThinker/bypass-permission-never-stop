@@ -60,6 +60,7 @@ scripts/smoke-published.sh
 - `Security Scan`: runs secret scanning on push/PR
 - `Dependabot`: monthly npm dependency update PRs (non-major only)
 - `Smoke Published Package`: weekly + manual smoke test against npm package
+- `Growth Metrics`: weekly star/fork/watcher snapshot in workflow summary
 
 ### Required GitHub Secret
 
@@ -117,3 +118,7 @@ See `docs/TRUSTED_PUBLISHING.md`.
 ## Release Notes Template
 
 See `.github/RELEASE_TEMPLATE.md`.
+
+## Changelog
+
+See `CHANGELOG.md`.

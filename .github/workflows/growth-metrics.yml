@@ -1,0 +1,26 @@
+name: Growth Metrics
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * 1"
+
+jobs:
+  stars:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect repository metrics
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const repoInfo = await github.rest.repos.get({ owner, repo });
+            const stars = repoInfo.data.stargazers_count;
+            const forks = repoInfo.data.forks_count;
+            const watchers = repoInfo.data.subscribers_count;
+            core.summary
+              .addHeading('Growth Metrics')
+              .addRaw(`- Stars: ${stars}\n`)
+              .addRaw(`- Forks: ${forks}\n`)
+              .addRaw(`- Watchers: ${watchers}\n`)
+              .write();
