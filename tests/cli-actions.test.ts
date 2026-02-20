@@ -79,6 +79,7 @@ describe("CLI actions", () => {
 
     expect(logger.banner).toHaveBeenCalled();
     expect(logger.costWarning).toHaveBeenCalled();
+    expect(logger.info).toHaveBeenCalledWith("Starting install flow...");
     expect(orch.install).toHaveBeenCalledWith("/tmp/claude", "2.1.39");
     expect(sessionLog).toHaveBeenCalledWith("Install started", "INSTALL");
     expect(exitSpy).not.toHaveBeenCalled();
@@ -131,6 +132,7 @@ describe("CLI actions", () => {
 
     await cli.parseAsync(["node", "cmd", "uninstall"], { from: "node" });
 
+    expect(logger.info).toHaveBeenCalledWith("Starting uninstall flow...");
     expect(logger.info).toHaveBeenCalledWith("Restoring original binary...");
     expect(logger.success).toHaveBeenCalledWith("Original binary restored successfully.");
     expect(sessionLog).toHaveBeenCalledWith("Uninstall successful", "UNINSTALL");

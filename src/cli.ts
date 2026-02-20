@@ -32,6 +32,7 @@ export function buildCli(signaturesDir?: string): Command {
   program.action(async () => {
     logger.banner();
     logger.costWarning();
+    logger.info("Starting install flow...");
 
     const paths = getDefaultPaths();
     const sessionLogger = new SessionLogger(paths.logDir);
@@ -94,6 +95,7 @@ export function buildCli(signaturesDir?: string): Command {
     .description("Restore the original Claude Code binary")
     .action(() => {
       logger.banner();
+      logger.info("Starting uninstall flow...");
 
       const paths = getDefaultPaths();
       const sessionLogger = new SessionLogger(paths.logDir);
