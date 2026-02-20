@@ -166,7 +166,10 @@ describe("Integration: Full Install/Uninstall Flow", () => {
 
   it("should handle generic fallback signature", () => {
     const targetPath = join(tempDir, "claude");
-    writeFileSync(targetPath, 'case"bypassPermissions":return"default"');
+    writeFileSync(
+      targetPath,
+      'case"bypassPermissions":return"default" yield{type:"result",subtype:"success",is_error:iR,duration_ms:Date.now()-g'
+    );
 
     // Write generic signature
     const sig = {
@@ -192,7 +195,10 @@ describe("Integration: Full Install/Uninstall Flow", () => {
 
   it("should log session events during install", () => {
     const targetPath = join(tempDir, "claude");
-    writeFileSync(targetPath, 'case"bypassPermissions":return"default"');
+    writeFileSync(
+      targetPath,
+      'case"bypassPermissions":return"default" yield{type:"result",subtype:"success",is_error:iR,duration_ms:Date.now()-g'
+    );
     const sig = {
       versionRange: "generic",
       minVersion: "0.0.0",

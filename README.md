@@ -94,6 +94,7 @@ npm test -- --coverage
 npm pack --dry-run
 scripts/smoke-published.sh
 npm run qa:mixed
+npm run qa:pnpm2149
 ```
 
 ## CI / CD

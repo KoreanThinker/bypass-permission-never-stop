@@ -19,17 +19,21 @@ describe("findClaudeCodeTarget strategies", () => {
   let tempDir: string;
   let oldHome: string | undefined;
   let oldPath: string | undefined;
+  let oldPnpmHome: string | undefined;
 
   beforeEach(() => {
     tempDir = mkdtempSync(join(tmpdir(), "finder-strategy-"));
     oldHome = process.env.HOME;
     oldPath = process.env.PATH;
+    oldPnpmHome = process.env.PNPM_HOME;
     process.env.HOME = tempDir;
+    delete process.env.PNPM_HOME;
   });
 
   afterEach(() => {
     process.env.HOME = oldHome;
     process.env.PATH = oldPath;
+    process.env.PNPM_HOME = oldPnpmHome;
     rmSync(tempDir, { recursive: true, force: true });
   });
 

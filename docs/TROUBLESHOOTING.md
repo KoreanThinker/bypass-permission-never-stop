@@ -102,8 +102,9 @@ ls -la "$(pnpm root -g)/@anthropic-ai/claude-code"
 
 Fix:
 
-- `bypass-permission-never-stop`를 최신으로 업데이트 (`0.1.3+`)
+- `bypass-permission-never-stop`를 최신으로 업데이트 (`0.1.6+`)
 - 최신 버전은 JS 타겟을 binary보다 우선 선택
+- pnpm 글로벌 스토어 기반 설치(`@anthropic-ai/claude-code@2.1.49`) 시그니처를 지원
 - 검증 스크립트 실행:
 
 ```bash
@@ -127,6 +128,25 @@ Fix:
 - Check version support in `signatures/`
 - Add/update signature patterns for the new binary shape
 - Re-run with backup/restore validation
+
+## `No compatible never-stop hook pattern found` 오류
+
+Symptom:
+
+```text
+No compatible never-stop hook pattern found for this Claude CLI build.
+```
+
+Cause:
+
+- 현재 설치된 Claude CLI 번들 구조가 훅 패턴과 맞지 않음.
+- 이 경우 최신 버전에서는 부분 패치를 막기 위해 설치를 실패 처리함.
+
+Fix:
+
+- `bypass-permission-never-stop` 최신 버전으로 업데이트 (`0.1.6+`)
+- Claude CLI 버전 확인 후(`claude --version` 또는 패키지 `version`) 대응 시그니처 지원 여부 확인
+- 필요 시 `signatures/`와 훅 패턴을 해당 버전에 맞게 추가
 
 ## CI release fails on npm publish
 

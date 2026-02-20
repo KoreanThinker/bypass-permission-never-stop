@@ -23,32 +23,28 @@ describe("HookInjector", () => {
     rmSync(tempDir, { recursive: true, force: true });
   });
 
-  describe("generateNeverStopPatch", () => {
-    it("should generate a patch with the correct id", () => {
-      const patch = injector.generateNeverStopPatch();
-      expect(patch.id).toBe("never-stop-hook");
-      expect(patch.search).toBeTruthy();
-      expect(patch.replace).toBeTruthy();
-      expect(patch.description).toContain("never-stop");
+  describe("getNeverStopPatches", () => {
+    it("should expose multiple known hook patch variants", () => {
+      const patches = injector.getNeverStopPatches();
+      expect(patches.length).toBeGreaterThanOrEqual(2);
+      expect(patches.some((p) => p.id === "never-stop-hook-legacy")).toBe(true);
+      expect(patches.some((p) => p.id === "never-stop-hook-v2149")).toBe(true);
     });
+  });
 
-    it("should target the success result yield pattern", () => {
+  describe("generateNeverStopPatch", () => {
+    it("should return the legacy patch for backward compatibility", () => {
       const patch = injector.generateNeverStopPatch();
+      expect(patch.id).toBe("never-stop-hook-legacy");
       expect(patch.search).toContain("result");
       expect(patch.search).toContain("success");
-    });
-
-    it("should generate a real behavior-changing replacement", () => {
-      const patch = injector.generateNeverStopPatch();
-      expect(patch.replace).not.toBe(patch.search);
       expect(patch.replace).toContain("neverStop");
       expect(patch.replace).toContain("XT.filter");
     });
   });
 
   describe("injectHook", () => {
-    it("should inject the never-stop hook into content", () => {
-      // Create content that contains the target pattern
+    it("should inject the legacy never-stop hook into content", () => {
       const content = Buffer.from(
         'yield{type:"result",subtype:"success",is_error:iR,duration_ms:Date.now()-g'
       );
@@ -57,6 +53,18 @@ describe("HookInjector", () => {
       expect(result.buffer).toBeDefined();
       expect(result.buffer!.toString("utf-8")).toContain("neverStop");
       expect(result.buffer!.toString("utf-8")).toContain("XT.filter");
+    });
+
+    it("should inject the v2.1.49 never-stop hook into content", () => {
+      const content = Buffer.from(
+        'yield{type:"result",subtype:"success",is_error:w1,duration_ms:Date.now()-u'
+      );
+      const result = injector.injectHook(content);
+      expect(result.success).toBe(true);
+      expect(result.buffer).toBeDefined();
+      expect(result.buffer!.toString("utf-8")).toContain("neverStop");
+      expect(result.buffer!.toString("utf-8")).toContain("Z6.filter");
+      expect(result.buffer!.toString("utf-8")).toContain("j6?.mode");
     });
 
     it("should fail gracefully when pattern not found", () => {
@@ -68,7 +76,7 @@ describe("HookInjector", () => {
   });
 
   describe("buildAllPatches", () => {
-    it("should combine UI patches and hook patches", () => {
+    it("should combine UI patches and matching hook patch when content is provided", () => {
       const uiPatches: PatchEntry[] = [
         {
           id: "mode-cycle",
@@ -77,13 +85,18 @@ describe("HookInjector", () => {
           replace: "replace1",
         },
       ];
-      const allPatches = injector.buildAllPatches(uiPatches);
+      const content = Buffer.from(
+        'yield{type:"result",subtype:"success",is_error:w1,duration_ms:Date.now()-u'
+      );
+      const allPatches = injector.buildAllPatches(uiPatches, content);
       expect(allPatches.length).toBeGreaterThan(uiPatches.length);
       expect(allPatches.some((p) => p.id === "mode-cycle")).toBe(true);
-      expect(allPatches.some((p) => p.id === "never-stop-hook")).toBe(true);
+      expect(allPatches.some((p) => p.id === "never-stop-hook-v2149")).toBe(
+        true
+      );
     });
 
-    it("should put UI patches before hook patches", () => {
+    it("should return UI-only list when content has no supported hook pattern", () => {
       const uiPatches: PatchEntry[] = [
         {
           id: "ui-patch",
@@ -92,10 +105,11 @@ describe("HookInjector", () => {
           replace: "replace1",
         },
       ];
-      const allPatches = injector.buildAllPatches(uiPatches);
-      const uiIdx = allPatches.findIndex((p) => p.id === "ui-patch");
-      const hookIdx = allPatches.findIndex((p) => p.id === "never-stop-hook");
-      expect(uiIdx).toBeLessThan(hookIdx);
+      const allPatches = injector.buildAllPatches(
+        uiPatches,
+        Buffer.from("nothing here")
+      );
+      expect(allPatches).toEqual(uiPatches);
     });
   });
 
@@ -135,6 +149,28 @@ describe("HookInjector", () => {
 
       const result = injector.patchFile(filePath, uiPatches);
       expect(result.appliedCount).toBeGreaterThanOrEqual(1);
+    });
+
+    it("should select and apply the v2.1.49 hook patch when needed", () => {
+      const filePath = join(tempDir, "target-v2149");
+      const content =
+        'START case"bypassPermissions":return"default" ' +
+        'MIDDLE yield{type:"result",subtype:"success",is_error:w1,duration_ms:Date.now()-u END';
+      writeFileSync(filePath, content);
+
+      const uiPatches: PatchEntry[] = [
+        {
+          id: "mode-cycle",
+          description: "test",
+          search: 'case"bypassPermissions":return"default"',
+          replace: 'case"bypassPermissions":return"neverStop"',
+        },
+      ];
+
+      const result = injector.patchFile(filePath, uiPatches);
+      expect(result.success).toBe(true);
+      const patched = readFileSync(filePath, "utf-8");
+      expect(patched).toContain("Z6.filter");
     });
   });
 });

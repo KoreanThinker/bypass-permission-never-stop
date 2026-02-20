@@ -4,6 +4,20 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-02-20
+
+### Fixed
+
+- Added an exact `2.1.49` signature set for current pnpm-installed Claude CLI layout (`U76`, `eT6`, `zq1` mode structures).
+- Added `2.1.49` never-stop hook injection pattern (`j6`/`Z6`/`w1`) so patch install no longer silently succeeds without behavior changes.
+- Updated signature selection to prefer the most specific matching range when signatures overlap (for example `2.1.49` over `2.1.x`).
+- Hardened install behavior to fail fast when no compatible never-stop hook exists, preventing partial patch state.
+
+### QA
+
+- Added regression tests for hook-variant selection and specific-version signature precedence.
+- Verified `qa:mixed`, full `test:ci` (coverage > 90%), and Docker Ubuntu (`node:24-bookworm`) test pass.
+
 ## [0.1.5] - 2026-02-20
 
 ### Fixed

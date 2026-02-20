@@ -114,16 +114,28 @@ export class Orchestrator {
       };
     }
 
+    const allPatches = this.hookInjector.buildAllPatches(
+      signature.patches,
+      content
+    );
+    const hasNeverStopHook = allPatches.some((patch) =>
+      patch.id.startsWith("never-stop-hook")
+    );
+    if (!hasNeverStopHook) {
+      return {
+        success: false,
+        error:
+          "No compatible never-stop hook pattern found for this Claude CLI build.",
+      };
+    }
+
     // Create backup before patching
     this.backup.createBackup(targetPath, version ?? undefined);
-
-    // Build complete patch set (UI patches + hook patches)
-    const allPatches = this.hookInjector.buildAllPatches(signature.patches);
 
     // Apply patches
     const result = this.patcher.patchFile(targetPath, allPatches);
 
-    if (result.appliedCount === 0) {
+    if (!result.success || result.appliedCount === 0) {
       // Restore backup since no patches were applied
       try {
         this.backup.restore();
@@ -132,12 +144,15 @@ export class Orchestrator {
       }
       return {
         success: false,
-        error: "No patches could be applied to the target file.",
+        error:
+          result.appliedCount === 0
+            ? "No patches could be applied to the target file."
+            : `Patch application failed for: ${result.failedPatches.join(", ")}`,
       };
     }
 
     return {
-      success: result.success || result.appliedCount > 0,
+      success: true,
       patchedCount: result.appliedCount,
       version,
     };

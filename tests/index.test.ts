@@ -16,6 +16,8 @@ describe("Orchestrator", () => {
   let sigDir: string;
   let backupDir: string;
   let logDir: string;
+  const LEGACY_HOOK_PATTERN =
+    'yield{type:"result",subtype:"success",is_error:iR,duration_ms:Date.now()-g';
 
   beforeEach(() => {
     tempDir = mkdtempSync(join(tmpdir(), "orchestrator-test-"));
@@ -76,7 +78,7 @@ describe("Orchestrator", () => {
 
     it("should create a backup before patching", () => {
       const targetPath = createFakeTarget(
-        'case"bypassPermissions":return"default"'
+        `case"bypassPermissions":return"default" ${LEGACY_HOOK_PATTERN}`
       );
       writeSignature([
         {
@@ -98,6 +100,30 @@ describe("Orchestrator", () => {
         readFileSync(join(backupDir, "manifest.json"), "utf-8")
       );
       expect(manifest.originalPath).toBe(targetPath);
+    });
+
+    it("should fail when no compatible never-stop hook pattern exists", () => {
+      const content = 'case"bypassPermissions":return"default"';
+      const targetPath = createFakeTarget(content);
+      writeSignature([
+        {
+          id: "mode-cycle",
+          search: 'case"bypassPermissions":return"default"',
+          replace: 'case"bypassPermissions":return"neverStop"',
+        },
+      ]);
+
+      const orch = new Orchestrator({
+        signaturesDir: sigDir,
+        backupDir,
+        logDir,
+      });
+      const result = orch.install(targetPath, null);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain("No compatible never-stop hook pattern");
+      expect(readFileSync(targetPath, "utf-8")).toBe(content);
+      expect(existsSync(join(backupDir, "manifest.json"))).toBe(false);
     });
 
     it("should refuse native executable targets to avoid corruption", () => {
@@ -164,7 +190,7 @@ describe("Orchestrator", () => {
 
     it("should not re-patch an already patched file", () => {
       const targetPath = createFakeTarget(
-        'case"bypassPermissions":return"default"'
+        `case"bypassPermissions":return"default" ${LEGACY_HOOK_PATTERN}`
       );
       writeSignature([
         {
@@ -192,7 +218,8 @@ describe("Orchestrator", () => {
 
   describe("uninstall", () => {
     it("should restore the original file from backup", () => {
-      const originalContent = 'case"bypassPermissions":return"default"';
+      const originalContent =
+        `case"bypassPermissions":return"default" ${LEGACY_HOOK_PATTERN}`;
       const targetPath = createFakeTarget(originalContent);
       writeSignature([
         {

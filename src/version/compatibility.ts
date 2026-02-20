@@ -50,6 +50,32 @@ export function versionInRange(
   return true;
 }
 
+function versionToOrdinal(version: [number, number, number]): number {
+  return version[0] * 1_000_000 + version[1] * 1_000 + version[2];
+}
+
+function compareVersions(
+  a: [number, number, number] | null,
+  b: [number, number, number] | null
+): number {
+  if (!a && !b) return 0;
+  if (!a) return -1;
+  if (!b) return 1;
+
+  for (let i = 0; i < 3; i++) {
+    if (a[i] !== b[i]) return a[i] - b[i];
+  }
+  return 0;
+}
+
+function getRangeSpan(sig: PatchSignature): number {
+  const min = parseVersion(sig.minVersion);
+  const max = parseVersion(sig.maxVersion);
+  if (!min || !max) return Number.MAX_SAFE_INTEGER;
+
+  return Math.max(0, versionToOrdinal(max) - versionToOrdinal(min));
+}
+
 export class VersionCompatibility {
   private signatures: PatchSignature[] = [];
 
@@ -80,12 +106,22 @@ export class VersionCompatibility {
 
   findMatchingSignature(version: string | null): PatchSignature | null {
     if (version) {
-      // Try version-specific signatures first (non-generic)
-      for (const sig of this.signatures) {
-        if (sig.versionRange === "generic") continue;
-        if (versionInRange(version, sig.minVersion, sig.maxVersion)) {
-          return sig;
-        }
+      const matches = this.signatures.filter((sig) => {
+        if (sig.versionRange === "generic") return false;
+        return versionInRange(version, sig.minVersion, sig.maxVersion);
+      });
+
+      if (matches.length > 0) {
+        // Prefer the most specific range first (smallest span), then highest min version.
+        matches.sort((a, b) => {
+          const spanDelta = getRangeSpan(a) - getRangeSpan(b);
+          if (spanDelta !== 0) return spanDelta;
+
+          return (
+            compareVersions(parseVersion(b.minVersion), parseVersion(a.minVersion))
+          );
+        });
+        return matches[0];
       }
     }
 

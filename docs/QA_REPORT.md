@@ -4,6 +4,7 @@
 
 - Verify mixed installation environments where native Claude binary and pnpm JS install coexist.
 - Verify regression safety for install/uninstall and target selection.
+- Verify `@anthropic-ai/claude-code@2.1.49` signature and never-stop hook patch path.
 - Verify tmux execution path.
 - Verify Linux container test baseline.
 
@@ -22,7 +23,7 @@
 npm run test:ci
 ```
 
-Result: PASS (`142 tests`, coverage `92.52%` at run time).
+Result: PASS (`146 tests`, coverage `91.65%` at run time).
 
 2. Mixed target QA (local binary + pnpm JS):
 
@@ -39,7 +40,23 @@ Validated:
 - Local native binary remains untouched.
 - `uninstall` restores JS target.
 
-3. tmux manual QA (same mixed scenario, separate tmux session):
+3. pnpm 2.1.49 mixed-target QA:
+
+```bash
+npm run qa:pnpm2149
+```
+
+Result: PASS.
+
+Validated:
+
+- Exact `2.1.49` signature selected over broad `2.1.x`.
+- `eT6` mode cycle patch applied with `neverStop` transition.
+- `zq1` mode display metadata includes `Never Stop`.
+- `2.1.49` hook injection path (`j6`/`Z6`/`w1`) applied.
+- `uninstall` restores original JS target content.
+
+4. tmux manual QA (same mixed scenario, separate tmux session):
 
 Result: PASS.
 
@@ -49,7 +66,7 @@ Validated:
 - JS target patched, local binary unchanged.
 - Uninstall restores patched JS target.
 
-4. Docker Linux QA:
+5. Docker Linux QA:
 
 ```bash
 docker run --rm -v "$PWD:/work" -w /work node:24-bookworm bash -lc "npm ci --silent && npm run test:ci"
@@ -60,5 +77,4 @@ Result: PASS.
 ## Notes
 
 - Native executable patching remains blocked by design for safety.
-- Version `0.1.4` includes mixed-target preference logic (`pnpm JS` preferred over local native binary fallback).
-- Version `0.1.3` fixed CLI `--version` output mismatch.
+- Version `0.1.6` adds explicit `2.1.49` signature + hook support and fails install when no compatible hook is found (prevents partial patch success).

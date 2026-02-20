@@ -190,6 +190,23 @@ describe("VersionCompatibility", () => {
       expect(match).not.toBeNull();
       expect(match!.versionRange).toBe("generic");
     });
+
+    it("should prefer the most specific signature when ranges overlap", () => {
+      writeSignature("v2.1.x.json", v21xSig);
+
+      const exactSig: PatchSignature = {
+        ...v21xSig,
+        versionRange: "2.1.49",
+        minVersion: "2.1.49",
+        maxVersion: "2.1.49",
+      };
+      writeSignature("v2.1.49.json", exactSig);
+
+      const compat = new VersionCompatibility(sigDir);
+      const match = compat.findMatchingSignature("2.1.49");
+      expect(match).not.toBeNull();
+      expect(match!.versionRange).toBe("2.1.49");
+    });
   });
 
   describe("getSupportedVersions", () => {

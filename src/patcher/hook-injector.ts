@@ -1,5 +1,26 @@
 import type { PatchEntry } from "../version/compatibility.js";
 import { UiPatcher, type MultiPatchResult } from "./ui-patcher.js";
+import { readFileSync } from "node:fs";
+
+const LEGACY_NEVER_STOP_HOOK_PATCH: PatchEntry = {
+  id: "never-stop-hook-legacy",
+  description:
+    "Inject never-stop hook into legacy agent loop success handler",
+  search:
+    'yield{type:"result",subtype:"success",is_error:iR,duration_ms:Date.now()-g',
+  replace:
+    'if((toolPermissionContext?.mode)==="neverStop"){globalThis.__ns_err=globalThis.__ns_err||[];if(iR){globalThis.__ns_err.push(""+iR);if(globalThis.__ns_err.length>5)globalThis.__ns_err.shift()}else globalThis.__ns_err=[];if(!(globalThis.__ns_err.length===5&&globalThis.__ns_err.every(e=>e===globalThis.__ns_err[0]))){var _nsLast=XT.filter(m=>m.type==="user").pop();if(_nsLast){XT.push(_nsLast);continue}}}yield{type:"result",subtype:"success",is_error:iR,duration_ms:Date.now()-g',
+};
+
+const V2149_NEVER_STOP_HOOK_PATCH: PatchEntry = {
+  id: "never-stop-hook-v2149",
+  description:
+    "Inject never-stop hook into 2.1.49 agent loop success handler",
+  search:
+    'yield{type:"result",subtype:"success",is_error:w1,duration_ms:Date.now()-u',
+  replace:
+    'if((j6?.mode)==="neverStop"){globalThis.__ns_err=globalThis.__ns_err||[];if(w1){globalThis.__ns_err.push(""+w1);if(globalThis.__ns_err.length>5)globalThis.__ns_err.shift()}else globalThis.__ns_err=[];if(!(globalThis.__ns_err.length===5&&globalThis.__ns_err.every(e=>e===globalThis.__ns_err[0]))){var _nsLast=Z6.filter(m=>m.type==="user").pop();if(_nsLast){Z6.push(_nsLast);continue}}}yield{type:"result",subtype:"success",is_error:w1,duration_ms:Date.now()-u',
+};
 
 /**
  * HookInjector handles the "never stop" logic injection.
@@ -14,43 +35,66 @@ import { UiPatcher, type MultiPatchResult } from "./ui-patcher.js";
  */
 export class HookInjector {
   private patcher = new UiPatcher();
+  private hookPatches: PatchEntry[] = [
+    LEGACY_NEVER_STOP_HOOK_PATCH,
+    V2149_NEVER_STOP_HOOK_PATCH,
+  ];
 
   /**
-   * Generate the patch that intercepts the success result to enable never-stop.
-   * This modifies the success yield to check for neverStop mode first.
+   * Generate the default (legacy) patch for backward compatibility in tests.
    */
   generateNeverStopPatch(): PatchEntry {
-    // The target: the success result yield after the for-await loop
-    // Original: yield{type:"result",subtype:"success",is_error:iR,duration_ms:Date.now()-g
-    // We inject a neverStop mode check before it
-    const search = 'yield{type:"result",subtype:"success",is_error:iR,duration_ms:Date.now()-g';
+    return this.hookPatches[0];
+  }
 
-    // Inject logic that replays the last user message in neverStop mode.
-    // Includes a compact circuit-breaker gate via global error history.
-    const replace = 'if((toolPermissionContext?.mode)==="neverStop"){globalThis.__ns_err=globalThis.__ns_err||[];if(iR){globalThis.__ns_err.push(""+iR);if(globalThis.__ns_err.length>5)globalThis.__ns_err.shift()}else globalThis.__ns_err=[];if(!(globalThis.__ns_err.length===5&&globalThis.__ns_err.every(e=>e===globalThis.__ns_err[0]))){var _nsLast=XT.filter(m=>m.type==="user").pop();if(_nsLast){XT.push(_nsLast);continue}}}yield{type:"result",subtype:"success",is_error:iR,duration_ms:Date.now()-g';
+  /**
+   * Return all known never-stop hook patches.
+   */
+  getNeverStopPatches(): PatchEntry[] {
+    return [...this.hookPatches];
+  }
 
-    return {
-      id: "never-stop-hook",
-      description:
-        "Inject never-stop hook into the agent loop success handler",
-      search,
-      replace,
-    };
+  /**
+   * Find the first hook patch that matches the provided content.
+   */
+  findCompatibleHookPatch(content: Buffer): PatchEntry | null {
+    const text = content.toString("utf-8");
+    for (const patch of this.hookPatches) {
+      if (text.includes(patch.search)) {
+        return patch;
+      }
+    }
+    return null;
   }
 
   /**
    * Try to inject the never-stop hook into the content buffer.
    */
   injectHook(content: Buffer): { success: boolean; buffer?: Buffer; error?: string } {
-    const patch = this.generateNeverStopPatch();
+    const patch = this.findCompatibleHookPatch(content);
+    if (!patch) {
+      return {
+        success: false,
+        error: "No compatible never-stop hook pattern found in target",
+      };
+    }
     return this.patcher.applyPatch(content, patch);
   }
 
   /**
    * Combine UI patches with hook patches into a complete patch set.
    */
-  buildAllPatches(uiPatches: PatchEntry[]): PatchEntry[] {
-    return [...uiPatches, this.generateNeverStopPatch()];
+  buildAllPatches(uiPatches: PatchEntry[], content?: Buffer): PatchEntry[] {
+    if (!content) {
+      return [...uiPatches, this.generateNeverStopPatch()];
+    }
+
+    const hookPatch = this.findCompatibleHookPatch(content);
+    if (!hookPatch) {
+      return [...uiPatches];
+    }
+
+    return [...uiPatches, hookPatch];
   }
 
   /**
@@ -73,7 +117,8 @@ export class HookInjector {
    * Apply all patches (UI + hook) to a file.
    */
   patchFile(filePath: string, uiPatches: PatchEntry[]): MultiPatchResult {
-    const allPatches = this.buildAllPatches(uiPatches);
+    const content = readFileSync(filePath);
+    const allPatches = this.buildAllPatches(uiPatches, content);
     return this.patcher.patchFile(filePath, allPatches);
   }
 }
