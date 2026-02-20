@@ -46,6 +46,20 @@ H=$(mktemp -d)
 HOME="$H" npx -y bypass-permission-never-stop --help
 ```
 
+4. If `command not found` appears while running inside this repository root, run from another directory:
+
+```bash
+cd ~
+npx -y bypass-permission-never-stop@latest
+```
+
+Alternative (from repo checkout):
+
+```bash
+npm run build
+node dist/cli.js
+```
+
 ## `claude` exits immediately with `killed`
 
 Symptom:
