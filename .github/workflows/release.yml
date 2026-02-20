@@ -42,11 +42,15 @@ jobs:
       - name: Package dry-run
         run: npm pack --dry-run
 
-      - name: Publish to npm
-        if: ${{ github.event_name == 'release' || inputs.publish }}
+      - name: Publish to npm (token mode)
+        if: ${{ (github.event_name == 'release' || inputs.publish) && secrets.NPM_TOKEN != '' }}
         run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish to npm (trusted publishing mode)
+        if: ${{ (github.event_name == 'release' || inputs.publish) && secrets.NPM_TOKEN == '' }}
+        run: npm publish --access public --provenance
 
       - name: Publish skipped (dry run mode)
         if: ${{ github.event_name == 'workflow_dispatch' && !inputs.publish }}

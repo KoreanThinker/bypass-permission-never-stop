@@ -91,6 +91,10 @@ scripts/smoke-published.sh
 ### Recommended: npm Trusted Publishing
 
 If you configure npm Trusted Publishing for this repository, you can remove long-lived publish tokens and rely on GitHub OIDC.
+The `Release` workflow supports both modes automatically:
+
+- If `NPM_TOKEN` exists, it uses token publish mode.
+- If `NPM_TOKEN` is empty, it uses trusted publishing mode.
 
 ### Release Flow
 

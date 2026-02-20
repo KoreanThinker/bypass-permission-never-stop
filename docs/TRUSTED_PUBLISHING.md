@@ -29,6 +29,11 @@ After trusted publishing is confirmed:
 - remove `NPM_TOKEN` secret
 - publish from release workflow using OIDC path
 
+The repository release workflow already handles both cases:
+
+- token present -> token publish step
+- token absent -> trusted publishing step
+
 ## 4) Validate
 
 1. Trigger release workflow with publish enabled
