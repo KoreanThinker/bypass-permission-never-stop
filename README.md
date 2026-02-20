@@ -1,4 +1,4 @@
-# bypass-permission-never-stop
+# ♾️ bypass-permission-never-stop
 
 Installer that adds `never stop` mode to Claude Code's Shift+Tab cycle.
 
