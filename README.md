@@ -50,6 +50,7 @@ npm install
 npm run build
 npm test -- --coverage
 npm pack --dry-run
+scripts/smoke-published.sh
 ```
 
 ## CI / CD
@@ -58,6 +59,7 @@ npm pack --dry-run
 - `Release`: runs build/test and publishes to npm when a GitHub Release is published
 - `Security Scan`: runs secret scanning on push/PR
 - `Dependabot`: monthly npm dependency update PRs (non-major only)
+- `Smoke Published Package`: weekly + manual smoke test against npm package
 
 ### Required GitHub Secret
 
@@ -103,3 +105,11 @@ See `SECURITY.md`.
 ## Growth Plan
 
 See `docs/GROWTH_PLAYBOOK.md`.
+
+## Troubleshooting
+
+See `docs/TROUBLESHOOTING.md`.
+
+## Trusted Publishing
+
+See `docs/TRUSTED_PUBLISHING.md`.

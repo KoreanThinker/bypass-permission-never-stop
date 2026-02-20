@@ -37,8 +37,8 @@
 
 ## Immediate Backlog
 
-- Add troubleshooting doc for npm/2FA/token errors
-- Add end-to-end smoke test script for published package
-- Add docs for Trusted Publishing setup
-- Add short demo output section per release
-- Add “good first issue” labeled tasks
+- [x] Add troubleshooting doc for npm/2FA/token errors
+- [x] Add end-to-end smoke test script for published package
+- [x] Add docs for Trusted Publishing setup
+- [ ] Add short demo output section per release
+- [ ] Add “good first issue” labeled tasks

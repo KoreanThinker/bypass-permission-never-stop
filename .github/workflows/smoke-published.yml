@@ -1,0 +1,32 @@
+name: Smoke Published Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      packageVersion:
+        description: "Version to test (optional, default latest)"
+        required: false
+        default: ""
+  schedule:
+    - cron: "0 3 * * 1"
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Run published package smoke test
+        run: |
+          if [ -n "${{ inputs.packageVersion }}" ]; then
+            PACKAGE_VERSION="${{ inputs.packageVersion }}" scripts/smoke-published.sh
+          else
+            scripts/smoke-published.sh
+          fi
