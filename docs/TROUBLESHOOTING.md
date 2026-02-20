@@ -84,6 +84,32 @@ Fix:
 - Run `uninstall` if you previously patched it.
 - Use a JavaScript CLI target when available.
 
+## pnpm으로 Claude를 설치했는데 패치가 안 되는 경우
+
+Symptoms:
+
+- `which claude`는 `~/.local/share/claude/versions/...`(native binary)를 가리킴
+- pnpm global에도 `@anthropic-ai/claude-code`가 설치되어 있음
+- 패치가 binary 차단 메시지로 실패
+
+Checks:
+
+```bash
+which claude
+pnpm root -g
+ls -la "$(pnpm root -g)/@anthropic-ai/claude-code"
+```
+
+Fix:
+
+- `bypass-permission-never-stop`를 최신으로 업데이트 (`0.1.3+`)
+- 최신 버전은 JS 타겟을 binary보다 우선 선택
+- 검증 스크립트 실행:
+
+```bash
+npm run qa:mixed
+```
+
 ## Patch fails with missing patterns
 
 Symptom:

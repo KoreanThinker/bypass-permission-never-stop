@@ -84,16 +84,26 @@ export async function findClaudeCodeTarget(): Promise<ClaudeCodeTarget | null> {
     findViaClaudeDir,
   ];
 
+  let firstBinaryTarget: ClaudeCodeTarget | null = null;
+
   for (const strategy of strategies) {
     try {
       const target = strategy();
-      if (target) return target;
+      if (!target) continue;
+
+      if (target.type === "js") {
+        return target;
+      }
+
+      if (!firstBinaryTarget) {
+        firstBinaryTarget = target;
+      }
     } catch {
       // Strategy failed, try next
     }
   }
 
-  return null;
+  return firstBinaryTarget;
 }
 
 // Legacy compatibility wrapper

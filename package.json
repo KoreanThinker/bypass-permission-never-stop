@@ -1,6 +1,6 @@
 {
   "name": "bypass-permission-never-stop",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Bypass Permission Never Stop - Unofficial Claude Code God Mode Injector",
   "main": "dist/index.js",
   "bin": {
@@ -11,7 +11,8 @@
     "dev": "ts-node src/cli.ts",
     "lint": "eslint src/",
     "test": "vitest",
-    "test:ci": "vitest run --coverage"
+    "test:ci": "vitest run --coverage",
+    "qa:mixed": "bash scripts/qa-pnpm-mixed-target.sh"
   },
   "keywords": [
     "claude",

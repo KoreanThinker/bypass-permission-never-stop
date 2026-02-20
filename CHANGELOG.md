@@ -4,6 +4,18 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-02-20
+
+### Fixed
+
+- Prefer JavaScript Claude targets over native binary candidates when both are present (for pnpm/global mixed installs).
+- Added regression test coverage for `local binary + pnpm JS` coexistence target selection.
+
+### Added
+
+- New manual QA script: `scripts/qa-pnpm-mixed-target.sh` (`npm run qa:mixed`).
+- Updated QA documentation in `CLAUDE.md` and `docs/QA_REPORT.md`.
+
 ## [0.1.3] - 2026-02-20
 
 ### Fixed

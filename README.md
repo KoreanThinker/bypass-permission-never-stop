@@ -56,6 +56,7 @@ node dist/cli.js uninstall
 ## Features
 
 - One-command install patch flow
+- Mixed install safety: prefers JavaScript target when local native + pnpm JS installs coexist
 - Native executable safety guard (prevents corrupting Claude binary)
 - `neverStop` mode added to mode cycle / mode label paths
 - Hook injection that replays the last user message in never-stop mode
@@ -92,6 +93,7 @@ npm run build
 npm test -- --coverage
 npm pack --dry-run
 scripts/smoke-published.sh
+npm run qa:mixed
 ```
 
 ## CI / CD
@@ -161,6 +163,10 @@ Published URL: `https://koreanthinker.github.io/bypass-permission-never-stop/`
 ## Troubleshooting
 
 See `docs/TROUBLESHOOTING.md`.
+
+## QA Report
+
+See `docs/QA_REPORT.md`.
 
 ## Trusted Publishing
 

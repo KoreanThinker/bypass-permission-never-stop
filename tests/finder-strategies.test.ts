@@ -46,6 +46,53 @@ describe("findClaudeCodeTarget strategies", () => {
     expect(target?.version).toBe("2.1.11");
   });
 
+  it("prefers pnpm JS target when local binary and pnpm installs both exist", async () => {
+    const versionsDir = join(tempDir, ".local", "share", "claude", "versions");
+    mkdirSync(versionsDir, { recursive: true });
+    writeMachOBinary(join(versionsDir, "2.1.39"));
+
+    const fakeBin = join(tempDir, "bin");
+    mkdirSync(fakeBin, { recursive: true });
+    process.env.PATH = fakeBin;
+
+    const globalRoot = join(tempDir, "pnpm-global");
+    const pkgRoot = join(globalRoot, "@anthropic-ai", "claude-code");
+    mkdirSync(pkgRoot, { recursive: true });
+    writeFileSync(join(pkgRoot, "package.json"), JSON.stringify({ version: "3.2.1" }), "utf-8");
+    writeFileSync(join(pkgRoot, "cli.mjs"), "// pnpm cli\n", "utf-8");
+
+    // which resolves to local binary target
+    writeExecScript(
+      join(fakeBin, "which"),
+      `#!/bin/sh
+if [ "$1" = "claude" ]; then
+  echo "${join(versionsDir, "2.1.39")}"
+  exit 0
+fi
+exit 1
+`
+    );
+    // npm strategy unavailable
+    writeExecScript(join(fakeBin, "npm"), "#!/bin/sh\nexit 1\n");
+    // pnpm strategy available
+    writeExecScript(
+      join(fakeBin, "pnpm"),
+      `#!/bin/sh
+if [ "$1" = "root" ] && [ "$2" = "-g" ]; then
+  echo "${globalRoot}"
+  exit 0
+fi
+exit 1
+`
+    );
+
+    const target = await findClaudeCodeTarget();
+    expect(target).not.toBeNull();
+    expect(target?.type).toBe("js");
+    expect(target?.path).toBe(join(pkgRoot, "cli.mjs"));
+    expect(target?.version).toBe("3.2.1");
+  });
+
   it("uses non-semver fallback entry when file is large enough", async () => {
     const versionsDir = join(tempDir, ".local", "share", "claude", "versions");
     mkdirSync(versionsDir, { recursive: true });
