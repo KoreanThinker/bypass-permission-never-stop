@@ -8,6 +8,18 @@ This project is **not** affiliated with Anthropic.
 It patches installed Claude Code binaries/runtime files and may violate product terms.
 Use at your own risk.
 
+## Quick Start
+
+```bash
+npx bypass-permission-never-stop
+```
+
+Restore original binary:
+
+```bash
+npx bypass-permission-never-stop uninstall
+```
+
 ## Features
 
 - One-command install patch flow
@@ -17,16 +29,15 @@ Use at your own risk.
 - Backup + restore (`uninstall`) with SHA-256 manifest
 - Session log files in plain text
 
-## Install / Run
+## Example Output
 
-```bash
-npx bypass-permission-never-stop
-```
-
-Uninstall (restore original):
-
-```bash
-npx bypass-permission-never-stop uninstall
+```text
+[*] Scanning for Claude Code installation...
+[+] Found: ~/.local/share/claude/versions/2.1.39
+[*] Backing up original binary...
+[*] Patching mode cycle array...
+[*] Injecting never-stop hook...
+[+] Patch applied successfully.
 ```
 
 ## Development
@@ -35,6 +46,7 @@ npx bypass-permission-never-stop uninstall
 npm install
 npm run build
 npm test -- --coverage
+npm pack --dry-run
 ```
 
 ## QA Baseline

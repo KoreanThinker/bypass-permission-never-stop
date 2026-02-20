@@ -2,6 +2,7 @@
 import { Command } from "commander";
 import { join } from "node:path";
 import { homedir } from "node:os";
+import { realpathSync } from "node:fs";
 import { Orchestrator } from "./index.js";
 import { findClaudeCodeTarget } from "./finder/target-finder.js";
 import { Logger } from "./utils/logger.js";
@@ -121,12 +122,19 @@ export function buildCli(signaturesDir?: string): Command {
 }
 
 // Only run when executed directly (not imported in tests)
-const isDirectExecution =
-  typeof process !== "undefined" &&
-  process.argv[1] &&
-  (process.argv[1].endsWith("cli.js") || process.argv[1].endsWith("cli.ts"));
+function isDirectExecution(): boolean {
+  if (typeof process === "undefined" || !process.argv[1]) return false;
+  try {
+    // Resolve symlinks so npm/yarn/pnpm .bin launchers are detected.
+    const executedPath = realpathSync(process.argv[1]);
+    const modulePath = realpathSync(__filename);
+    return executedPath === modulePath;
+  } catch {
+    return false;
+  }
+}
 
-if (isDirectExecution) {
+if (isDirectExecution()) {
   const program = buildCli();
   program.parse();
 }
