@@ -1,11 +1,12 @@
 # ♾️ bypass-permission-never-stop
 
-[![npm version](https://img.shields.io/npm/v/bypass-permission-never-stop?style=for-the-badge)](https://www.npmjs.com/package/bypass-permission-never-stop)
-[![npm downloads](https://img.shields.io/npm/dw/bypass-permission-never-stop?style=for-the-badge)](https://www.npmjs.com/package/bypass-permission-never-stop)
-[![CI](https://img.shields.io/github/actions/workflow/status/KoreanThinker/bypass-permission-never-stop/ci.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/actions/workflow/status/KoreanThinker/bypass-permission-never-stop/release.yml?branch=main&style=for-the-badge&label=Release)](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/release.yml)
-[![License](https://img.shields.io/github/license/KoreanThinker/bypass-permission-never-stop?style=for-the-badge)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/KoreanThinker/bypass-permission-never-stop?style=for-the-badge)](https://github.com/KoreanThinker/bypass-permission-never-stop/stargazers)
+[![CI](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/ci.yml/badge.svg)](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/ci.yml)
+[![Release](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/release.yml/badge.svg)](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/release.yml)
+[![Security Scan](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/security.yml/badge.svg)](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/security.yml)
+[![npm version](https://badge.fury.io/js/bypass-permission-never-stop.svg)](https://www.npmjs.com/package/bypass-permission-never-stop)
+[![npm download](https://img.shields.io/npm/dt/bypass-permission-never-stop)](https://www.npmjs.com/package/bypass-permission-never-stop)
+[![License MIT](https://img.shields.io/github/license/KoreanThinker/bypass-permission-never-stop?style=flat)](LICENSE)
+![Stars](https://img.shields.io/github/stars/KoreanThinker/bypass-permission-never-stop?style=social)
 
 Installer that adds `never stop` mode to Claude Code's Shift+Tab cycle.
 
