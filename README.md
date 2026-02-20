@@ -1,5 +1,8 @@
 # bypass-permission-never-stop
 
+[![CI](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/ci.yml/badge.svg)](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/ci.yml)
+[![Security Scan](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/security.yml/badge.svg)](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/security.yml)
+
 Unofficial Claude Code runtime patcher that injects a `neverStop` mode into the Shift+Tab mode cycle.
 
 ## Disclaimer
@@ -54,7 +57,7 @@ npm pack --dry-run
 - `CI`: runs build + coverage checks on push/PR
 - `Release`: runs build/test and publishes to npm when a GitHub Release is published
 - `Security Scan`: runs secret scanning on push/PR
-- `Dependabot`: weekly npm dependency update PRs
+- `Dependabot`: monthly npm dependency update PRs (non-major only)
 
 ### Required GitHub Secret
 
@@ -84,3 +87,11 @@ tests/
 ## License
 
 MIT
+
+## Contributing
+
+See `CONTRIBUTING.md`.
+
+## Security
+
+See `SECURITY.md`.
