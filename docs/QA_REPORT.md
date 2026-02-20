@@ -66,7 +66,17 @@ Validated:
 - JS target patched, local binary unchanged.
 - Uninstall restores patched JS target.
 
-5. Docker Linux QA:
+5. tmux real interactive verification (`Shift+Tab` mode cycle):
+
+Result: PASS.
+
+Validated:
+
+- `tmux` session에서 patch 적용 후 `claude --dangerously-skip-permissions` 실제 실행.
+- 초기 trust/effort 프롬프트 통과 뒤 `Shift+Tab` 입력 반복.
+- 화면 하단 상태줄에 `never stop on` 표시 확인.
+
+6. Docker Linux QA:
 
 ```bash
 docker run --rm -v "$PWD:/work" -w /work node:24-bookworm bash -lc "npm ci --silent && npm run test:ci"

@@ -19,7 +19,7 @@ const V2149_NEVER_STOP_HOOK_PATCH: PatchEntry = {
   search:
     'yield{type:"result",subtype:"success",is_error:w1,duration_ms:Date.now()-u',
   replace:
-    'if((j6?.mode)==="neverStop"){globalThis.__ns_err=globalThis.__ns_err||[];if(w1){globalThis.__ns_err.push(""+w1);if(globalThis.__ns_err.length>5)globalThis.__ns_err.shift()}else globalThis.__ns_err=[];if(!(globalThis.__ns_err.length===5&&globalThis.__ns_err.every(e=>e===globalThis.__ns_err[0]))){var _nsLast=Z6.filter(m=>m.type==="user").pop();if(_nsLast){Z6.push(_nsLast);continue}}}yield{type:"result",subtype:"success",is_error:w1,duration_ms:Date.now()-u',
+    'if((j6?.mode)==="neverStop"){globalThis.__ns_err=globalThis.__ns_err||[];if(w1){globalThis.__ns_err.push(""+w1);if(globalThis.__ns_err.length>5)globalThis.__ns_err.shift()}else globalThis.__ns_err=[];if(!(globalThis.__ns_err.length===5&&globalThis.__ns_err.every(e=>e===globalThis.__ns_err[0]))){var _nsLast=Z6.filter(m=>m.type==="user").pop();if(_nsLast){Z6.push(_nsLast)}}}yield{type:"result",subtype:"success",is_error:w1,duration_ms:Date.now()-u',
 };
 
 /**

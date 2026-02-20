@@ -4,6 +4,20 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-02-20
+
+### Fixed
+
+- Removed invalid `continue` injection from the `2.1.49` never-stop hook patch (it caused `SyntaxError: Illegal continue statement` on `claude` startup).
+- Kept `2.1.49` hook compatibility while preventing runtime crash after patch.
+
+### QA
+
+- Verified in real `tmux` interactive session:
+  - `npx` patch install
+  - `claude --dangerously-skip-permissions` launch
+  - `Shift+Tab` cycle shows `never stop on` in the footer (`2.1.49`).
+
 ## [0.1.6] - 2026-02-20
 
 ### Fixed

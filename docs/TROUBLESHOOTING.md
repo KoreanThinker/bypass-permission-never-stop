@@ -162,6 +162,24 @@ Fix:
 - Claude CLI 버전 확인 후(`claude --version` 또는 패키지 `version`) 대응 시그니처 지원 여부 확인
 - 필요 시 `signatures/`와 훅 패턴을 해당 버전에 맞게 추가
 
+## 패치 후 `claude` 실행 시 `Illegal continue statement` 에러
+
+Symptom:
+
+```text
+SyntaxError: Illegal continue statement: no surrounding iteration statement
+```
+
+Fix:
+
+- `bypass-permission-never-stop` 최신 버전으로 업데이트 (`0.1.7+`)
+- 기존 패치를 한 번 롤백 후 재적용:
+
+```bash
+npx -y bypass-permission-never-stop@latest uninstall
+npx -y bypass-permission-never-stop@latest
+```
+
 ## CI release fails on npm publish
 
 Checklist:
