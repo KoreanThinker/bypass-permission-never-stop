@@ -10,6 +10,7 @@ All notable changes to this project are documented in this file.
 
 - Switched release workflow runtime to Node.js 24 for npm Trusted Publishing compatibility.
 - Removed token dependency (`NPM_TOKEN`) and standardized OIDC-based publish path.
+- Added `package.json` repository/bugs/homepage metadata required for npm provenance verification.
 
 ## [0.1.1] - 2026-02-20
 

@@ -24,6 +24,14 @@
   ],
   "author": "hyun",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KoreanThinker/bypass-permission-never-stop"
+  },
+  "bugs": {
+    "url": "https://github.com/KoreanThinker/bypass-permission-never-stop/issues"
+  },
+  "homepage": "https://github.com/KoreanThinker/bypass-permission-never-stop#readme",
   "files": [
     "dist/",
     "signatures/"
