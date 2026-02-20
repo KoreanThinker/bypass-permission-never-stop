@@ -15,11 +15,11 @@ const LEGACY_NEVER_STOP_HOOK_PATCH: PatchEntry = {
 const V2149_NEVER_STOP_HOOK_PATCH: PatchEntry = {
   id: "never-stop-hook-v2149",
   description:
-    "Inject never-stop hook into 2.1.49 agent loop success handler",
+    "Inject never-stop loop into 2.1.49 interactive chat submit handler",
   search:
-    'yield{type:"result",subtype:"success",is_error:w1,duration_ms:Date.now()-u',
+    "await f6(e6,{setCursorOffset:E6,clearBuffer:K5,resetHistory:bH})},[a6,W1,O1,p6,L6,F,dA,U,PX.suggestions,f6,X6,K5,bH,n6,z6,i6,V,p7]),",
   replace:
-    'if((j6?.mode)==="neverStop"){globalThis.__ns_err=globalThis.__ns_err||[];if(w1){globalThis.__ns_err.push(""+w1);if(globalThis.__ns_err.length>5)globalThis.__ns_err.shift()}else globalThis.__ns_err=[];if(!(globalThis.__ns_err.length===5&&globalThis.__ns_err.every(e=>e===globalThis.__ns_err[0]))){var _nsLast=Z6.filter(m=>m.type==="user").pop();if(_nsLast){Z6.push(_nsLast)}}}yield{type:"result",subtype:"success",is_error:w1,duration_ms:Date.now()-u',
+    'await f6(e6,{setCursorOffset:E6,clearBuffer:K5,resetHistory:bH});while(K.mode==="neverStop"||L6.getState().toolPermissionContext.mode==="neverStop"){await f6(e6,{setCursorOffset:E6,clearBuffer:K5,resetHistory:bH})}},[a6,W1,O1,p6,L6,F,dA,U,PX.suggestions,f6,X6,K5,bH,n6,z6,i6,V,p7,K]),',
 };
 
 /**

@@ -59,7 +59,7 @@ node dist/cli.js uninstall
 - Mixed install safety: prefers JavaScript target when local native + pnpm JS installs coexist
 - Native executable safety guard (prevents corrupting Claude binary)
 - `neverStop` mode added to mode cycle / mode label paths
-- Hook injection that replays the last user message in never-stop mode
+- Hook injection for real interactive `chat:submit` loop in `2.1.49` (never-stop re-submit path)
 - Circuit-breaker guard for repeated error loops
 - Backup + restore (`uninstall`) with SHA-256 manifest
 - Session log files in plain text

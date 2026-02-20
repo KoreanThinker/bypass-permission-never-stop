@@ -4,6 +4,22 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-02-20
+
+### Fixed
+
+- Switched `2.1.49` never-stop hook from SDK result-path injection (non-interactive path) to interactive `chat:submit` callback patching.
+- Added loop patch at submit boundary so `neverStop` mode now re-submits prompts continuously in real interactive sessions.
+- Added dependency-array patch for submit callback to keep mode-aware loop logic fresh across mode changes.
+
+### QA
+
+- Reproduced and verified in real `tmux` interactive session:
+  - Launch `claude --dangerously-skip-permissions`
+  - Cycle to `never stop on` with `Shift+Tab`
+  - Submit `hi` and observe repeated outputs/token growth over time
+- `npm run test:ci` still passes with coverage `> 90%`.
+
 ## [0.1.7] - 2026-02-20
 
 ### Fixed

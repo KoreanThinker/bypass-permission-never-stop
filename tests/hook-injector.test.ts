@@ -57,14 +57,20 @@ describe("HookInjector", () => {
 
     it("should inject the v2.1.49 never-stop hook into content", () => {
       const content = Buffer.from(
-        'yield{type:"result",subtype:"success",is_error:w1,duration_ms:Date.now()-u'
+        "await f6(e6,{setCursorOffset:E6,clearBuffer:K5,resetHistory:bH})},[a6,W1,O1,p6,L6,F,dA,U,PX.suggestions,f6,X6,K5,bH,n6,z6,i6,V,p7]),"
       );
       const result = injector.injectHook(content);
       expect(result.success).toBe(true);
       expect(result.buffer).toBeDefined();
       expect(result.buffer!.toString("utf-8")).toContain("neverStop");
-      expect(result.buffer!.toString("utf-8")).toContain("Z6.filter");
-      expect(result.buffer!.toString("utf-8")).toContain("j6?.mode");
+      expect(result.buffer!.toString("utf-8")).toContain(
+        "while(K.mode===\"neverStop\"||L6.getState().toolPermissionContext.mode===\"neverStop\")"
+      );
+      expect(result.buffer!.toString("utf-8")).toContain(
+        "await f6(e6,{setCursorOffset:E6,clearBuffer:K5,resetHistory:bH})"
+      );
+      expect(result.buffer!.toString("utf-8")).toContain(",p7,K]),");
+      expect(result.buffer!.toString("utf-8")).not.toContain("continue");
     });
 
     it("should fail gracefully when pattern not found", () => {
@@ -86,7 +92,7 @@ describe("HookInjector", () => {
         },
       ];
       const content = Buffer.from(
-        'yield{type:"result",subtype:"success",is_error:w1,duration_ms:Date.now()-u'
+        "await f6(e6,{setCursorOffset:E6,clearBuffer:K5,resetHistory:bH})},[a6,W1,O1,p6,L6,F,dA,U,PX.suggestions,f6,X6,K5,bH,n6,z6,i6,V,p7]),"
       );
       const allPatches = injector.buildAllPatches(uiPatches, content);
       expect(allPatches.length).toBeGreaterThan(uiPatches.length);
@@ -155,7 +161,7 @@ describe("HookInjector", () => {
       const filePath = join(tempDir, "target-v2149");
       const content =
         'START case"bypassPermissions":return"default" ' +
-        'MIDDLE yield{type:"result",subtype:"success",is_error:w1,duration_ms:Date.now()-u END';
+        "MIDDLE await f6(e6,{setCursorOffset:E6,clearBuffer:K5,resetHistory:bH})},[a6,W1,O1,p6,L6,F,dA,U,PX.suggestions,f6,X6,K5,bH,n6,z6,i6,V,p7]), END";
       writeFileSync(filePath, content);
 
       const uiPatches: PatchEntry[] = [
@@ -170,7 +176,9 @@ describe("HookInjector", () => {
       const result = injector.patchFile(filePath, uiPatches);
       expect(result.success).toBe(true);
       const patched = readFileSync(filePath, "utf-8");
-      expect(patched).toContain("Z6.filter");
+      expect(patched).toContain(
+        "while(K.mode===\"neverStop\"||L6.getState().toolPermissionContext.mode===\"neverStop\")"
+      );
     });
   });
 });

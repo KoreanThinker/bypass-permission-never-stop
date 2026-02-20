@@ -53,7 +53,7 @@ Validated:
 - Exact `2.1.49` signature selected over broad `2.1.x`.
 - `eT6` mode cycle patch applied with `neverStop` transition.
 - `zq1` mode display metadata includes `Never Stop`.
-- `2.1.49` hook injection path (`j6`/`Z6`/`w1`) applied.
+- `2.1.49` interactive hook injection path (`chat:submit` / `f6(...)` loop) applied.
 - `uninstall` restores original JS target content.
 
 4. tmux manual QA (same mixed scenario, separate tmux session):
@@ -75,6 +75,7 @@ Validated:
 - `tmux` session에서 patch 적용 후 `claude --dangerously-skip-permissions` 실제 실행.
 - 초기 trust/effort 프롬프트 통과 뒤 `Shift+Tab` 입력 반복.
 - 화면 하단 상태줄에 `never stop on` 표시 확인.
+- `hi` 제출 후 반복 응답/토큰 증가로 interactive never-stop 루프 동작 확인.
 
 6. Docker Linux QA:
 
@@ -87,4 +88,4 @@ Result: PASS.
 ## Notes
 
 - Native executable patching remains blocked by design for safety.
-- Version `0.1.6` adds explicit `2.1.49` signature + hook support and fails install when no compatible hook is found (prevents partial patch success).
+- Version `0.1.8` moves `2.1.49` hook to interactive submit path and verifies loop behavior in tmux.

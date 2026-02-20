@@ -12,7 +12,7 @@ Claude Code mode flow.
 
 ## Architecture
 - `src/finder/` - Phase 1: Locate Claude Code target on disk (JS preferred, binary fallback)
-- `src/patcher/` - Phase 2 & 3: UI mode injection + never-stop hook (message re-injection)
+- `src/patcher/` - Phase 2 & 3: UI mode injection + never-stop hook (interactive submit-loop injection)
 - `src/backup/` - Phase 4: Backup/restore mechanism (latest 1 only)
 - `src/version/` - Phase 5: Version detection + signature matching
 - `src/utils/` - Shared utilities (logger, circuit breaker, session logger)
@@ -41,5 +41,6 @@ Claude Code mode flow.
 - Automated suite: `npm run test:ci` passes with 90%+ coverage gate
 - Mixed target regression: `npm run qa:mixed` verifies JS preference over local binary fallback
 - pnpm 2.1.49 regression: `npm run qa:pnpm2149` verifies 2.1.49 signature + hook patch + uninstall restore
-- tmux QA: mixed-target install/uninstall scenario validated inside a tmux session
+- tmux QA: `send-keys -l` + `Enter` path validated for real prompt submit in vim insert mode
+- tmux interactive never-stop QA: `Shift+Tab` to `never stop on` then repeated submit loop verified by token growth
 - Docker QA: `node:24-bookworm` container runs `npm run test:ci` successfully
