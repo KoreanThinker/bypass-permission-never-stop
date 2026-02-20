@@ -57,15 +57,15 @@ describe("Logger", () => {
     it("should output the project name", () => {
       logger.banner();
       const output = stdoutSpy.mock.calls[0]?.[0] as string;
-      expect(output).toContain("BYPASS PERMISSION NEVER STOP");
+      expect(output).toContain("bypass-permission-never-stop");
     });
   });
 
   describe("costWarning", () => {
-    it("should output token consumption warning", () => {
+    it("should output token consumption notice", () => {
       logger.costWarning();
-      const output = stderrSpy.mock.calls[0]?.[0] as string;
-      expect(output).toContain("Warning");
+      const output = stdoutSpy.mock.calls[0]?.[0] as string;
+      expect(output).toContain("consume many tokens");
       expect(output).toContain("Ctrl+C");
     });
   });

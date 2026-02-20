@@ -17,18 +17,18 @@ export class Logger {
 
   banner(): void {
     process.stdout.write(
-      `\x1b[32m
-  ╔══════════════════════════════════════════════════╗
-  ║   BYPASS PERMISSION NEVER STOP                  ║
-  ║   Claude Code God Mode Injector                 ║
-  ╚══════════════════════════════════════════════════╝
+      `\x1b[36m
+  ┌──────────────────────────────────────────────────┐
+  │ bypass-permission-never-stop                    │
+  │ Claude Code never-stop installer (unofficial)   │
+  └──────────────────────────────────────────────────┘
 \x1b[0m\n`
     );
   }
 
   costWarning(): void {
-    process.stderr.write(
-      `\x1b[31m[!] Warning: This mode will consume tokens indefinitely until Ctrl+C.\x1b[0m\n`
+    process.stdout.write(
+      `\x1b[90m[i]\x1b[0m This mode can consume many tokens. Press Ctrl+C to stop anytime.\n`
     );
   }
 }

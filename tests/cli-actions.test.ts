@@ -51,6 +51,8 @@ async function setupCliScenario(s: Scenario) {
 
 describe("CLI actions", () => {
   let exitSpy: ReturnType<typeof vi.spyOn>;
+  let stdinTTYDescriptor: PropertyDescriptor | undefined;
+  let stdoutTTYDescriptor: PropertyDescriptor | undefined;
 
   beforeEach(() => {
     exitSpy = vi
@@ -58,9 +60,21 @@ describe("CLI actions", () => {
       .mockImplementation(((code?: string | number | null | undefined) => {
         throw new Error(`EXIT:${code ?? 0}`);
       }) as never);
+    stdinTTYDescriptor = Object.getOwnPropertyDescriptor(process.stdin, "isTTY");
+    stdoutTTYDescriptor = Object.getOwnPropertyDescriptor(process.stdout, "isTTY");
   });
 
   afterEach(() => {
+    if (stdinTTYDescriptor) {
+      Object.defineProperty(process.stdin, "isTTY", stdinTTYDescriptor);
+    } else {
+      delete (process.stdin as { isTTY?: boolean }).isTTY;
+    }
+    if (stdoutTTYDescriptor) {
+      Object.defineProperty(process.stdout, "isTTY", stdoutTTYDescriptor);
+    } else {
+      delete (process.stdout as { isTTY?: boolean }).isTTY;
+    }
     vi.restoreAllMocks();
     vi.unmock("../src/index.js");
     vi.unmock("../src/finder/target-finder.js");
@@ -75,7 +89,7 @@ describe("CLI actions", () => {
     });
     const cli = buildCli("/tmp/signatures");
 
-    await cli.parseAsync(["node", "cmd"], { from: "node" });
+    await cli.parseAsync(["node", "cmd", "--yes"], { from: "node" });
 
     expect(logger.banner).toHaveBeenCalled();
     expect(logger.costWarning).toHaveBeenCalled();
@@ -91,7 +105,9 @@ describe("CLI actions", () => {
     });
     const cli = buildCli("/tmp/signatures");
 
-    await expect(cli.parseAsync(["node", "cmd"], { from: "node" })).rejects.toThrow("EXIT:1");
+    await expect(cli.parseAsync(["node", "cmd", "--yes"], { from: "node" })).rejects.toThrow(
+      "EXIT:1"
+    );
 
     expect(logger.error).toHaveBeenCalledWith(
       "Native executable target detected. Binary patching is disabled for safety."
@@ -109,7 +125,9 @@ describe("CLI actions", () => {
     });
     const cli = buildCli("/tmp/signatures");
 
-    await expect(cli.parseAsync(["node", "cmd"], { from: "node" })).rejects.toThrow("EXIT:1");
+    await expect(cli.parseAsync(["node", "cmd", "--yes"], { from: "node" })).rejects.toThrow(
+      "EXIT:1"
+    );
 
     expect(orch.isPatched).toHaveBeenCalled();
     expect(logger.warn).toHaveBeenCalled();
@@ -123,7 +141,9 @@ describe("CLI actions", () => {
     });
     const cli = buildCli("/tmp/signatures");
 
-    await expect(cli.parseAsync(["node", "cmd"], { from: "node" })).rejects.toThrow("EXIT:1");
+    await expect(cli.parseAsync(["node", "cmd", "--yes"], { from: "node" })).rejects.toThrow(
+      "EXIT:1"
+    );
 
     expect(logger.error).toHaveBeenCalled();
   });
@@ -136,7 +156,9 @@ describe("CLI actions", () => {
     });
     const cli = buildCli("/tmp/signatures");
 
-    await expect(cli.parseAsync(["node", "cmd"], { from: "node" })).rejects.toThrow("EXIT:1");
+    await expect(cli.parseAsync(["node", "cmd", "--yes"], { from: "node" })).rejects.toThrow(
+      "EXIT:1"
+    );
 
     expect(orch.getSupportedVersions).toHaveBeenCalled();
     expect(logger.info).toHaveBeenCalledWith("Supported versions: 2.1.x, 2.2.x");
@@ -168,5 +190,44 @@ describe("CLI actions", () => {
 
     expect(logger.error).toHaveBeenCalledWith("Uninstall failed: no backup");
     expect(sessionLog).toHaveBeenCalledWith("Uninstall failed: no backup", "UNINSTALL");
+  });
+
+  it("aborts install in non-interactive shell without --yes", async () => {
+    const { buildCli, logger, sessionLog, orch } = await setupCliScenario({
+      target: { path: "/tmp/claude.js", type: "js", version: "2.1.39" },
+      installResult: { success: true, patchedCount: 1 },
+    });
+    Object.defineProperty(process.stdin, "isTTY", { configurable: true, value: false });
+    Object.defineProperty(process.stdout, "isTTY", { configurable: true, value: false });
+    const cli = buildCli("/tmp/signatures");
+
+    await expect(cli.parseAsync(["node", "cmd"], { from: "node" })).rejects.toThrow("EXIT:1");
+
+    expect(logger.warn).toHaveBeenCalledWith(
+      "Non-interactive shell detected. Re-run with --yes to install."
+    );
+    expect(sessionLog).toHaveBeenCalledWith(
+      "Install aborted: non-interactive shell without --yes",
+      "INSTALL"
+    );
+    expect(orch.install).not.toHaveBeenCalled();
+  });
+
+  it("cancels install when confirmation is denied", async () => {
+    const confirmInstall = vi.fn(async () => false);
+    const { buildCli, logger, sessionLog, orch } = await setupCliScenario({
+      target: { path: "/tmp/claude.js", type: "js", version: "2.1.39" },
+    });
+    Object.defineProperty(process.stdin, "isTTY", { configurable: true, value: true });
+    Object.defineProperty(process.stdout, "isTTY", { configurable: true, value: true });
+    const cli = buildCli("/tmp/signatures", { confirmInstall });
+
+    await cli.parseAsync(["node", "cmd"], { from: "node" });
+
+    expect(confirmInstall).toHaveBeenCalledTimes(1);
+    expect(logger.warn).toHaveBeenCalledWith("Install cancelled. No files were changed.");
+    expect(sessionLog).toHaveBeenCalledWith("Install cancelled by user", "INSTALL");
+    expect(orch.install).not.toHaveBeenCalled();
+    expect(exitSpy).not.toHaveBeenCalled();
   });
 });

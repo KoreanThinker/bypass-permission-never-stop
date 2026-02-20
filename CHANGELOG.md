@@ -4,6 +4,28 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.9] - 2026-02-20
+
+### Changed
+
+- Simplified README for end users (quick start, rollback, expected result, CI install, and links only).
+- Replaced long sample prompt with a single concise mission prompt.
+- Updated CLI banner style and removed red danger-style warning tone.
+
+### Added
+
+- Install confirmation prompt: `ARE YOU SURE INSTALL never-stop mode? (yes/no)`.
+- `--yes` option to skip prompt for CI/non-interactive automation.
+- Non-interactive safety exit when install is launched without `--yes`.
+
+### QA
+
+- Added/updated CLI tests for:
+  - confirmation prompt (`yes`/invalid input loop/non-interactive)
+  - install cancellation flow
+  - non-interactive shell protection
+- `npm run test:ci` passes with coverage above 90%.
+
 ## [0.1.8] - 2026-02-20
 
 ### Fixed

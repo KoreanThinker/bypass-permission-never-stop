@@ -3,6 +3,7 @@ import { Command } from "commander";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import { readFileSync, realpathSync } from "node:fs";
+import { createInterface } from "node:readline/promises";
 import { Orchestrator } from "./index.js";
 import { findClaudeCodeTarget } from "./finder/target-finder.js";
 import { Logger } from "./utils/logger.js";
@@ -32,26 +33,87 @@ export function getCliVersion(): string {
   return "0.0.0";
 }
 
-export function buildCli(signaturesDir?: string): Command {
+export type CliBuildOptions = {
+  confirmInstall?: () => Promise<boolean>;
+};
+
+type PromptIO = {
+  question: (query: string) => Promise<string>;
+  close: () => void;
+};
+
+type PromptFactory = (streams: {
+  input: NodeJS.ReadStream;
+  output: NodeJS.WriteStream;
+}) => PromptIO;
+
+export async function confirmInstallPrompt(promptFactory?: PromptFactory): Promise<boolean> {
+  if (!process.stdin.isTTY || !process.stdout.isTTY) {
+    return false;
+  }
+
+  const rl = (promptFactory ?? createInterface)({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  try {
+    while (true) {
+      const answer = (
+        await rl.question("ARE YOU SURE INSTALL never-stop mode? (yes/no): ")
+      )
+        .trim()
+        .toLowerCase();
+
+      if (answer === "yes" || answer === "y") return true;
+      if (answer === "no" || answer === "n" || answer === "") return false;
+      process.stdout.write("Please type yes or no.\n");
+    }
+  } finally {
+    rl.close();
+  }
+}
+
+export function buildCli(signaturesDir?: string, options?: CliBuildOptions): Command {
   const program = new Command();
   const logger = new Logger();
+  const confirmInstall = options?.confirmInstall ?? confirmInstallPrompt;
 
   const defaultSigDir = signaturesDir ?? join(__dirname, "..", "signatures");
 
   program
     .name("bypass-permission-never-stop")
-    .description("Unofficial Claude Code God Mode Injector")
+    .description("Install never-stop mode for Claude Code (unofficial)")
     .version(getCliVersion());
+
+  program.option("-y, --yes", "Skip install confirmation prompt");
 
   // Default action: install
   program.action(async () => {
     logger.banner();
     logger.costWarning();
+
+    const cliOptions = program.opts<{ yes?: boolean }>();
     logger.info("Starting install flow...");
 
     const paths = getDefaultPaths();
     const sessionLogger = new SessionLogger(paths.logDir);
     sessionLogger.log("Install started", "INSTALL");
+
+    if (!cliOptions.yes) {
+      if (!process.stdin.isTTY || !process.stdout.isTTY) {
+        logger.warn("Non-interactive shell detected. Re-run with --yes to install.");
+        sessionLogger.log("Install aborted: non-interactive shell without --yes", "INSTALL");
+        process.exit(1);
+      }
+
+      const confirmed = await confirmInstall();
+      if (!confirmed) {
+        logger.warn("Install cancelled. No files were changed.");
+        sessionLogger.log("Install cancelled by user", "INSTALL");
+        return;
+      }
+    }
 
     const orch = new Orchestrator({
       signaturesDir: defaultSigDir,
