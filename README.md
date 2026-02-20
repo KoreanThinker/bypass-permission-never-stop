@@ -1,6 +1,28 @@
 # ♾️ bypass-permission-never-stop
 
+[![npm version](https://img.shields.io/npm/v/bypass-permission-never-stop?style=for-the-badge)](https://www.npmjs.com/package/bypass-permission-never-stop)
+[![npm downloads](https://img.shields.io/npm/dw/bypass-permission-never-stop?style=for-the-badge)](https://www.npmjs.com/package/bypass-permission-never-stop)
+[![CI](https://img.shields.io/github/actions/workflow/status/KoreanThinker/bypass-permission-never-stop/ci.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/actions/workflow/status/KoreanThinker/bypass-permission-never-stop/release.yml?branch=main&style=for-the-badge&label=Release)](https://github.com/KoreanThinker/bypass-permission-never-stop/actions/workflows/release.yml)
+[![License](https://img.shields.io/github/license/KoreanThinker/bypass-permission-never-stop?style=for-the-badge)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/KoreanThinker/bypass-permission-never-stop?style=for-the-badge)](https://github.com/KoreanThinker/bypass-permission-never-stop/stargazers)
+
 Installer that adds `never stop` mode to Claude Code's Shift+Tab cycle.
+
+## 🎬 Live demo
+
+![Never stop mode demo](docs/assets/demo-never-stop.gif)
+
+## ⚙️ How it works
+
+- With `never stop on`, one submitted message is re-submitted repeatedly.
+- The loop continues while the Claude process and session are still active.
+
+## ✨ Highlights
+
+- 🚀 One-command install
+- 🔁 Continuous re-submit loop mode
+- ♻️ Safe rollback with `uninstall`
 
 ## Quick start
 
