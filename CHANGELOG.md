@@ -4,6 +4,25 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.13] - 2026-02-23
+
+### Fixed
+
+- Target discovery now resolves pnpm shim launchers from `which claude` (for example `/Users/<user>/Library/pnpm/claude`) to the real runtime `cli.js` path, so patching applies to the actual `claude` executable being run.
+- Prevented false target selection where npm global install was patched while the active runtime was pnpm global.
+
+### Added
+
+- Finder regression test for `which claude` pnpm shim resolution with npm-global fallback present.
+
+### QA
+
+- `npm test`
+- `bash scripts/qa-pnpm-v2149.sh`
+- `bash scripts/qa-pnpm-v2150.sh`
+- `bash scripts/qa-pnpm-mixed-target.sh`
+- tmux install validation: confirmed installer resolves and patches pnpm runtime target path.
+
 ## [0.1.12] - 2026-02-23
 
 ### Fixed

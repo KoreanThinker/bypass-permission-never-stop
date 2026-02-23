@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, mkdirSync, writeFileSync, chmodSync, rmSync } from "node:fs";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { findClaudeCodeTarget, findClaudeCodePath } from "../src/finder/target-finder.js";
 
@@ -192,6 +192,70 @@ exit 1
     expect(target?.path).toBe(join(distDir, "cli.mjs"));
     expect(target?.type).toBe("js");
     expect(target?.version).toBe("9.9.9");
+  });
+
+  it("resolves pnpm shim target from `which claude` before npm global fallback", async () => {
+    const fakeBin = join(tempDir, "bin");
+    mkdirSync(fakeBin, { recursive: true });
+    process.env.PATH = fakeBin;
+
+    const shimBase = join(tempDir, "pnpm");
+    const shimPath = join(shimBase, "claude");
+    const shimTarget = join(
+      shimBase,
+      "global",
+      "5",
+      ".pnpm",
+      "@anthropic-ai+claude-code@2.1.49",
+      "node_modules",
+      "@anthropic-ai",
+      "claude-code",
+      "cli.js"
+    );
+    mkdirSync(dirname(shimTarget), { recursive: true });
+    writeFileSync(join(dirname(shimTarget), "package.json"), JSON.stringify({ version: "2.1.49" }), "utf-8");
+    writeFileSync(shimTarget, "// pnpm shim target cli\n", "utf-8");
+    writeExecScript(
+      shimPath,
+      `#!/bin/sh
+basedir=$(dirname "$(echo "$0" | sed -e 's,\\\\,/,g')")
+exec node "$basedir/global/5/.pnpm/@anthropic-ai+claude-code@2.1.49/node_modules/@anthropic-ai/claude-code/cli.js" "$@"
+`
+    );
+
+    // npm global also exists, but should NOT be selected if shim resolution works.
+    const npmGlobal = join(tempDir, "npm-global");
+    const npmPkgRoot = join(npmGlobal, "@anthropic-ai", "claude-code");
+    mkdirSync(npmPkgRoot, { recursive: true });
+    writeFileSync(join(npmPkgRoot, "package.json"), JSON.stringify({ version: "9.9.9" }), "utf-8");
+    writeFileSync(join(npmPkgRoot, "cli.js"), "// npm global cli\n", "utf-8");
+
+    writeExecScript(
+      join(fakeBin, "which"),
+      `#!/bin/sh
+if [ "$1" = "claude" ]; then
+  echo "${shimPath}"
+  exit 0
+fi
+exit 1
+`
+    );
+    writeExecScript(
+      join(fakeBin, "npm"),
+      `#!/bin/sh
+if [ "$1" = "root" ] && [ "$2" = "-g" ]; then
+  echo "${npmGlobal}"
+  exit 0
+fi
+exit 1
+`
+    );
+
+    const target = await findClaudeCodeTarget();
+    expect(target).not.toBeNull();
+    expect(target?.type).toBe("js");
+    expect(target?.path).toBe(shimTarget);
+    expect(target?.version).toBe("2.1.49");
   });
 
   it("falls back to npm global lookup", async () => {

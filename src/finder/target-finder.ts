@@ -80,6 +80,41 @@ function resolvePackageTarget(packageRoot: string): ClaudeCodeTarget | null {
   return { path: cliPath, type: "js", version };
 }
 
+function resolvePnpmShimTarget(shimPath: string): ClaudeCodeTarget | null {
+  try {
+    const text = readFileSync(shimPath, "utf-8");
+
+    // pnpm shims commonly exec "$basedir/global/.../.pnpm/@anthropic-ai+claude-code@x.y.z/.../cli.js"
+    const basedirMatch = text.match(
+      /\$basedir\/([^"\n]*@anthropic-ai\+claude-code@[^"\n]*\/node_modules\/@anthropic-ai\/claude-code\/cli\.(?:mjs|js))/
+    );
+    let cliPath: string | null = null;
+    if (basedirMatch) {
+      cliPath = resolve(dirname(shimPath), basedirMatch[1]);
+    } else {
+      const absoluteMatch = text.match(
+        /(\/[^"'\n]*@anthropic-ai\+claude-code@[^"'\n]*\/node_modules\/@anthropic-ai\/claude-code\/cli\.(?:mjs|js))/
+      );
+      if (absoluteMatch) {
+        cliPath = absoluteMatch[1];
+      }
+    }
+
+    if (!cliPath || !existsSync(cliPath)) {
+      return null;
+    }
+
+    const version = extractVersionFromPackageJson(dirname(cliPath));
+    return {
+      path: cliPath,
+      type: "js",
+      version,
+    };
+  } catch {
+    return null;
+  }
+}
+
 function findClaudePackageInPnpmVersionRoot(versionRoot: string): ClaudeCodeTarget | null {
   const direct = resolvePackageTarget(join(versionRoot, "node_modules", CLAUDE_PACKAGE));
   if (direct) return direct;
@@ -244,6 +279,12 @@ function findViaWhich(): ClaudeCodeTarget | null {
       const pathMatch = binaryPath.match(/(\d+\.\d+\.\d+)/);
       const version = pathMatch ? pathMatch[1] : extractVersionFromBinary(binaryPath);
       return { path: binaryPath, type, version };
+    }
+
+    // If `which claude` points to a package-manager shim, resolve its real CLI target.
+    const shimTarget = resolvePnpmShimTarget(binaryPath);
+    if (shimTarget) {
+      return shimTarget;
     }
 
     // JS file - walk up to find package root
