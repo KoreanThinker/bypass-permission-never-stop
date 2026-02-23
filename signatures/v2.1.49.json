@@ -20,7 +20,7 @@
       "id": "mode-display-zq1-v2149",
       "description": "Add neverStop display metadata in zq1 map in 2.1.49",
       "search": "bypassPermissions:{title:\"Bypass Permissions\",shortTitle:\"Bypass\",symbol:\"⏵⏵\",color:\"error\",external:\"bypassPermissions\"},dontAsk:{title:\"Don't Ask\",shortTitle:\"DontAsk\",symbol:\"⏵⏵\",color:\"error\",external:\"dontAsk\"}}",
-      "replace": "bypassPermissions:{title:\"Bypass Permissions\",shortTitle:\"Bypass\",symbol:\"⏵⏵\",color:\"error\",external:\"bypassPermissions\"},dontAsk:{title:\"Don't Ask\",shortTitle:\"DontAsk\",symbol:\"⏵⏵\",color:\"error\",external:\"dontAsk\"},neverStop:{title:\"BYPASS PERMISSION NEVER STOP\",shortTitle:\"NEVER STOP\",symbol:\"✶✶\",color:\"autoAccept\",external:\"neverStop\"}}"
+      "replace": "bypassPermissions:{title:\"Bypass Permissions\",shortTitle:\"Bypass\",symbol:\"⏵⏵\",color:\"error\",external:\"bypassPermissions\"},dontAsk:{title:\"Don't Ask\",shortTitle:\"DontAsk\",symbol:\"⏵⏵\",color:\"error\",external:\"dontAsk\"},neverStop:{title:\"BYPASS PERMISSION NEVER STOP\",shortTitle:\"NEVER STOP\",symbol:\"∞\",color:\"error\",external:\"neverStop\"}}"
     }
   ]
 }

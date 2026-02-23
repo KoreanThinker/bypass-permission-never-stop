@@ -69,7 +69,7 @@ HOME="$HOME_DIR" PATH="$BIN_DIR:$NODE_BIN_DIR:/usr/bin:/bin" node dist/cli.js --
 
 grep -Fq 'o76=["acceptEdits","bypassPermissions","default","dontAsk","neverStop","plan"]' "$JS_TARGET"
 grep -Fq 'case"bypassPermissions":return"neverStop";case"neverStop":return"default"' "$JS_TARGET"
-grep -Fq 'neverStop:{title:"BYPASS PERMISSION NEVER STOP",shortTitle:"NEVER STOP",symbol:"✶✶",color:"autoAccept",external:"neverStop"}' "$JS_TARGET"
+grep -Fq 'neverStop:{title:"BYPASS PERMISSION NEVER STOP",shortTitle:"NEVER STOP",symbol:"∞",color:"error",external:"neverStop"}' "$JS_TARGET"
 grep -Fq 'while(v6.getState().toolPermissionContext.mode==="neverStop"){await n(x1,{setCursorOffset:Y6,clearBuffer:y3,resetHistory:U5})}' "$JS_TARGET"
 
 if grep -q 'neverStop' "$LOCAL_BIN"; then

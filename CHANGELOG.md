@@ -4,6 +4,20 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.15] - 2026-02-23
+
+### Changed
+
+- Switched never-stop symbol from `✶✶` to Unicode infinity `∞` (non-emoji glyph) for clearer mode identity.
+- Changed never-stop display color from `autoAccept` to `error` (red) for stronger visual emphasis.
+
+### QA
+
+- `npm test`
+- `bash scripts/qa-pnpm-v2149.sh`
+- `bash scripts/qa-pnpm-v2150.sh`
+- `bash scripts/qa-pnpm-mixed-target.sh`
+
 ## [0.1.14] - 2026-02-23
 
 ### Changed
