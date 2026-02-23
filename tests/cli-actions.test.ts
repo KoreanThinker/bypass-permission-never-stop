@@ -178,6 +178,41 @@ describe("CLI actions", () => {
     expect(sessionLog).toHaveBeenCalledWith("Uninstall successful", "UNINSTALL");
   });
 
+  it("runs upgrade action successfully when already patched", async () => {
+    const { buildCli, logger, sessionLog, orch } = await setupCliScenario({
+      isPatched: true,
+      target: { path: "/tmp/claude.js", type: "js", version: "2.1.50" },
+      uninstallResult: { success: true },
+      installResult: { success: true, patchedCount: 4 },
+    });
+    const cli = buildCli("/tmp/signatures");
+
+    await cli.parseAsync(["node", "cmd", "upgrade", "--yes"], { from: "node" });
+
+    expect(logger.info).toHaveBeenCalledWith("Starting upgrade flow...");
+    expect(orch.uninstall).toHaveBeenCalledTimes(1);
+    expect(orch.install).toHaveBeenCalledWith("/tmp/claude.js", "2.1.50");
+    expect(sessionLog).toHaveBeenCalledWith("Upgrade started", "UPGRADE");
+  });
+
+  it("fails upgrade when restore step fails", async () => {
+    const { buildCli, logger, orch } = await setupCliScenario({
+      isPatched: true,
+      uninstallResult: { success: false, error: "restore failed" },
+      target: { path: "/tmp/claude.js", type: "js", version: "2.1.50" },
+    });
+    const cli = buildCli("/tmp/signatures");
+
+    await expect(
+      cli.parseAsync(["node", "cmd", "upgrade", "--yes"], { from: "node" })
+    ).rejects.toThrow("EXIT:1");
+
+    expect(logger.error).toHaveBeenCalledWith(
+      "Upgrade failed during restore: restore failed"
+    );
+    expect(orch.install).not.toHaveBeenCalled();
+  });
+
   it("exits when uninstall fails", async () => {
     const { buildCli, logger, sessionLog } = await setupCliScenario({
       uninstallResult: { success: false, error: "no backup" },

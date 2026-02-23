@@ -80,6 +80,123 @@ export function buildCli(signaturesDir?: string, options?: CliBuildOptions): Com
   const confirmInstall = options?.confirmInstall ?? confirmInstallPrompt;
 
   const defaultSigDir = signaturesDir ?? join(__dirname, "..", "signatures");
+  const paths = getDefaultPaths();
+
+  const runInstallFlow = async (
+    mode: "install" | "upgrade",
+    skipPrompt: boolean
+  ): Promise<void> => {
+    const modeLabel = mode === "install" ? "Install" : "Upgrade";
+    const modeAction = mode === "install" ? "INSTALL" : "UPGRADE";
+    logger.info(`Starting ${mode} flow...`);
+
+    const sessionLogger = new SessionLogger(paths.logDir);
+    sessionLogger.log(`${modeLabel} started`, modeAction);
+
+    if (!skipPrompt) {
+      if (!process.stdin.isTTY || !process.stdout.isTTY) {
+        logger.warn(
+          `Non-interactive shell detected. Re-run with --yes to ${mode}.`
+        );
+        sessionLogger.log(
+          `${modeLabel} aborted: non-interactive shell without --yes`,
+          modeAction
+        );
+        process.exit(1);
+      }
+
+      const confirmed = await confirmInstall();
+      if (!confirmed) {
+        logger.warn(`${modeLabel} cancelled. No files were changed.`);
+        sessionLogger.log(`${modeLabel} cancelled by user`, modeAction);
+        return;
+      }
+    }
+
+    const orch = new Orchestrator({
+      signaturesDir: defaultSigDir,
+      backupDir: paths.backupDir,
+      logDir: paths.logDir,
+    });
+
+    if (mode === "install") {
+      if (orch.isPatched()) {
+        logger.warn("Already patched. Run 'uninstall' first to re-patch.");
+        sessionLogger.log("Already patched, aborting", "INSTALL");
+        process.exit(1);
+      }
+    } else if (orch.isPatched()) {
+      logger.info("Existing patch detected. Restoring original binary first...");
+      const uninstallResult = orch.uninstall();
+      if (!uninstallResult.success) {
+        logger.error(`Upgrade failed during restore: ${uninstallResult.error}`);
+        sessionLogger.log(
+          `Upgrade restore failed: ${uninstallResult.error}`,
+          "UPGRADE"
+        );
+        process.exit(1);
+      }
+    }
+
+    // Find Claude Code
+    logger.info("Scanning for Claude Code installation...");
+    const target = await findClaudeCodeTarget();
+    if (!target) {
+      logger.error("Claude Code not found on this system.");
+      logger.error("Make sure Claude Code is installed and accessible.");
+      sessionLogger.log("Claude Code not found", modeAction);
+      process.exit(1);
+    }
+
+    logger.success(`Found: ${target.path}`);
+    logger.info(`Type: ${target.type} | Version: ${target.version ?? "unknown"}`);
+    sessionLogger.log(
+      `Found target: ${target.path} (${target.type}, v${target.version})`,
+      modeAction
+    );
+
+    if (target.type === "binary") {
+      logger.error(
+        "Native executable target detected. Binary patching is disabled for safety."
+      );
+      logger.info(
+        "Run 'bypass-permission-never-stop uninstall' if you previously patched this binary."
+      );
+      logger.info(
+        "Use a JavaScript Claude CLI target (for example npm global install) to patch safely."
+      );
+      sessionLogger.log("Native executable target blocked for safety", modeAction);
+      process.exit(1);
+    }
+
+    logger.info("Backing up original binary...");
+    logger.info("Patching mode cycle array...");
+    logger.info("Injecting never-stop hook...");
+
+    const result = orch.install(target.path, target.version);
+
+    if (result.success) {
+      const verb = mode === "install" ? "Patch" : "Upgrade";
+      logger.success(`${verb} applied successfully (${result.patchedCount} patches).`);
+      logger.success(
+        "Run 'claude' and hit Shift+Tab to find 'bypass permission never stop' mode."
+      );
+      sessionLogger.log(
+        `${modeLabel} successful: ${result.patchedCount} patches applied`,
+        modeAction
+      );
+    } else {
+      logger.error(`${modeLabel} failed: ${result.error}`);
+
+      const supported = orch.getSupportedVersions();
+      if (supported.length > 0) {
+        logger.info(`Supported versions: ${supported.join(", ")}`);
+      }
+
+      sessionLogger.log(`${modeLabel} failed: ${result.error}`, modeAction);
+      process.exit(1);
+    }
+  };
 
   program
     .name("bypass-permission-never-stop")
@@ -94,92 +211,7 @@ export function buildCli(signaturesDir?: string, options?: CliBuildOptions): Com
     logger.costWarning();
 
     const cliOptions = program.opts<{ yes?: boolean }>();
-    logger.info("Starting install flow...");
-
-    const paths = getDefaultPaths();
-    const sessionLogger = new SessionLogger(paths.logDir);
-    sessionLogger.log("Install started", "INSTALL");
-
-    if (!cliOptions.yes) {
-      if (!process.stdin.isTTY || !process.stdout.isTTY) {
-        logger.warn("Non-interactive shell detected. Re-run with --yes to install.");
-        sessionLogger.log("Install aborted: non-interactive shell without --yes", "INSTALL");
-        process.exit(1);
-      }
-
-      const confirmed = await confirmInstall();
-      if (!confirmed) {
-        logger.warn("Install cancelled. No files were changed.");
-        sessionLogger.log("Install cancelled by user", "INSTALL");
-        return;
-      }
-    }
-
-    const orch = new Orchestrator({
-      signaturesDir: defaultSigDir,
-      backupDir: paths.backupDir,
-      logDir: paths.logDir,
-    });
-
-    // Check if already patched
-    if (orch.isPatched()) {
-      logger.warn("Already patched. Run 'uninstall' first to re-patch.");
-      sessionLogger.log("Already patched, aborting", "INSTALL");
-      process.exit(1);
-    }
-
-    // Find Claude Code
-    logger.info("Scanning for Claude Code installation...");
-    const target = await findClaudeCodeTarget();
-    if (!target) {
-      logger.error("Claude Code not found on this system.");
-      logger.error("Make sure Claude Code is installed and accessible.");
-      sessionLogger.log("Claude Code not found", "INSTALL");
-      process.exit(1);
-    }
-
-    logger.success(`Found: ${target.path}`);
-    logger.info(`Type: ${target.type} | Version: ${target.version ?? "unknown"}`);
-    sessionLogger.log(`Found target: ${target.path} (${target.type}, v${target.version})`, "INSTALL");
-
-    if (target.type === "binary") {
-      logger.error(
-        "Native executable target detected. Binary patching is disabled for safety."
-      );
-      logger.info(
-        "Run 'bypass-permission-never-stop uninstall' if you previously patched this binary."
-      );
-      logger.info(
-        "Use a JavaScript Claude CLI target (for example npm global install) to patch safely."
-      );
-      sessionLogger.log("Native executable target blocked for safety", "INSTALL");
-      process.exit(1);
-    }
-
-    // Install
-    logger.info("Backing up original binary...");
-    logger.info("Patching mode cycle array...");
-    logger.info("Injecting never-stop hook...");
-
-    const result = orch.install(target.path, target.version);
-
-    if (result.success) {
-      logger.success(`Patch applied successfully (${result.patchedCount} patches).`);
-      logger.success(
-        "Run 'claude' and hit Shift+Tab to find 'bypass permission never stop' mode."
-      );
-      sessionLogger.log(`Patch successful: ${result.patchedCount} patches applied`, "INSTALL");
-    } else {
-      logger.error(`Patch failed: ${result.error}`);
-
-      const supported = orch.getSupportedVersions();
-      if (supported.length > 0) {
-        logger.info(`Supported versions: ${supported.join(", ")}`);
-      }
-
-      sessionLogger.log(`Patch failed: ${result.error}`, "INSTALL");
-      process.exit(1);
-    }
+    await runInstallFlow("install", !!cliOptions.yes);
   });
 
   // Uninstall command
@@ -211,6 +243,23 @@ export function buildCli(signaturesDir?: string, options?: CliBuildOptions): Com
         sessionLogger.log(`Uninstall failed: ${result.error}`, "UNINSTALL");
         process.exit(1);
       }
+    });
+
+  // Upgrade command
+  program
+    .command("upgrade")
+    .alias("update")
+    .description("Re-apply latest patch (restore + install)")
+    .option("-y, --yes", "Skip install confirmation prompt")
+    .action(async function (this: Command, cmdOptions?: { yes?: boolean }) {
+      logger.banner();
+      logger.costWarning();
+      const localOpts = this.opts<{ yes?: boolean }>();
+      const globalOpts = program.opts<{ yes?: boolean }>();
+      const skipPrompt = !!(
+        cmdOptions?.yes ?? localOpts.yes ?? globalOpts.yes
+      );
+      await runInstallFlow("upgrade", skipPrompt);
     });
 
   return program;

@@ -39,6 +39,14 @@ When prompted, type `yes` to install.
 npx bypass-permission-never-stop uninstall
 ```
 
+## Upgrade (best practice)
+
+```bash
+npx bypass-permission-never-stop upgrade
+```
+
+`upgrade` is the recommended path over manual `uninstall` + install.
+
 ## What you should see
 
 1. Run `claude`

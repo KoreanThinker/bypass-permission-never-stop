@@ -4,6 +4,28 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.14] - 2026-02-23
+
+### Changed
+
+- Removed rainbow-style never-stop symbol and switched to a stronger high-contrast mode style:
+  - `title: "BYPASS PERMISSION NEVER STOP"`
+  - `shortTitle: "NEVER STOP"`
+  - `symbol: "✶✶"`
+  - `color: "autoAccept"`
+
+### Added
+
+- New `upgrade` command (alias: `update`) to re-apply patch without manual uninstall/install steps.
+
+### QA
+
+- `npm run build`
+- `npm test`
+- `bash scripts/qa-pnpm-v2149.sh`
+- `bash scripts/qa-pnpm-v2150.sh`
+- `bash scripts/qa-pnpm-mixed-target.sh`
+
 ## [0.1.13] - 2026-02-23
 
 ### Fixed

@@ -67,6 +67,12 @@ describe("buildCli", () => {
     expect(commands).toContain("uninstall");
   });
 
+  it("should have upgrade command", () => {
+    const cli = buildCli(sigDir);
+    const commands = cli.commands.map((c) => c.name());
+    expect(commands).toContain("upgrade");
+  });
+
   it("should resolve CLI version from package.json", () => {
     const version = getCliVersion();
     const pkg = JSON.parse(readFileSync(join(__dirname, "..", "package.json"), "utf-8"));
