@@ -143,12 +143,12 @@ Fix:
 - Add/update signature patterns for the new binary shape
 - Re-run with backup/restore validation
 
-## `No compatible BYPASS PERMISSION NEVER STOP hook pattern found` 오류
+## `No compatible bypass permission never stop hook pattern found` 오류
 
 Symptom:
 
 ```text
-No compatible BYPASS PERMISSION NEVER STOP hook pattern found for this Claude CLI build.
+No compatible bypass permission never stop hook pattern found for this Claude CLI build.
 ```
 
 Cause:

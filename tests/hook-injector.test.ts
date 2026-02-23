@@ -51,7 +51,7 @@ describe("HookInjector", () => {
   });
 
   describe("injectHook", () => {
-    it("should inject the legacy BYPASS PERMISSION NEVER STOP hook into content", () => {
+    it("should inject the legacy bypass permission never stop hook into content", () => {
       const content = Buffer.from(
         'yield{type:"result",subtype:"success",is_error:iR,duration_ms:Date.now()-g'
       );
@@ -62,7 +62,7 @@ describe("HookInjector", () => {
       expect(result.buffer!.toString("utf-8")).toContain("XT.filter");
     });
 
-    it("should inject the v2.1.49 BYPASS PERMISSION NEVER STOP hook into content", () => {
+    it("should inject the v2.1.49 bypass permission never stop hook into content", () => {
       const content = Buffer.from(
         "await f6(e6,{setCursorOffset:E6,clearBuffer:K5,resetHistory:bH})},[a6,W1,O1,p6,L6,F,dA,U,PX.suggestions,f6,X6,K5,bH,n6,z6,i6,V,p7]),"
       );
@@ -80,7 +80,7 @@ describe("HookInjector", () => {
       expect(result.buffer!.toString("utf-8")).not.toContain("continue");
     });
 
-    it("should inject the v2.1.50 BYPASS PERMISSION NEVER STOP hook into content", () => {
+    it("should inject the v2.1.50 bypass permission never stop hook into content", () => {
       const content = Buffer.from(
         "await n(x1,{setCursorOffset:Y6,clearBuffer:y3,resetHistory:U5})},[o6,O1,g6,C6,v6,x,m8,rY.suggestions,n,z6,y3,U5,H7,k6,d8,N,g8]),"
       );

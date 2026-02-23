@@ -60,7 +60,7 @@ export async function confirmInstallPrompt(promptFactory?: PromptFactory): Promi
   try {
     while (true) {
       const answer = (
-        await rl.question("ARE YOU SURE INSTALL BYPASS PERMISSION NEVER STOP mode? (yes/no): ")
+        await rl.question("ARE YOU SURE INSTALL bypass permission never stop mode? (yes/no): ")
       )
         .trim()
         .toLowerCase();
@@ -171,17 +171,17 @@ export function buildCli(signaturesDir?: string, options?: CliBuildOptions): Com
 
     logger.info("Backing up original binary...");
     logger.info("Patching mode cycle array...");
-    logger.info("Injecting BYPASS PERMISSION NEVER STOP hook...");
+    logger.info("Injecting bypass permission never stop hook...");
 
     const result = orch.install(target.path, target.version);
 
     if (result.success) {
       const verb = mode === "install" ? "PATCH" : "UPGRADE";
       logger.success(
-        `${verb} COMPLETE: BYPASS PERMISSION NEVER STOP READY (${result.patchedCount} patches).`
+        `${verb} COMPLETE: bypass permission never stop READY (${result.patchedCount} patches).`
       );
       logger.success(
-        "Run 'claude' -> press Shift+Tab -> select 'BYPASS PERMISSION NEVER STOP'."
+        "Run 'claude' -> press Shift+Tab -> select 'bypass permission never stop'."
       );
       sessionLogger.log(
         `${modeLabel} successful: ${result.patchedCount} patches applied`,
@@ -202,7 +202,7 @@ export function buildCli(signaturesDir?: string, options?: CliBuildOptions): Com
 
   program
     .name("bypass-permission-never-stop")
-    .description("Install BYPASS PERMISSION NEVER STOP mode for Claude Code")
+    .description("Install bypass permission never stop mode for Claude Code")
     .version(getCliVersion());
 
   program.option("-y, --yes", "Skip install confirmation prompt");

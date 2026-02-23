@@ -4,7 +4,7 @@
 
 - Verify mixed installation environments where native Claude binary and pnpm JS install coexist.
 - Verify regression safety for install/uninstall and target selection.
-- Verify `@anthropic-ai/claude-code@2.1.49` signature and BYPASS PERMISSION NEVER STOP hook patch path.
+- Verify `@anthropic-ai/claude-code@2.1.49` signature and bypass permission never stop hook patch path.
 - Verify tmux execution path.
 - Verify Linux container test baseline.
 
@@ -52,7 +52,7 @@ Validated:
 
 - Exact `2.1.49` signature selected over broad `2.1.x`.
 - `eT6` mode cycle patch applied with `neverStop` transition.
-- `zq1` mode display metadata includes `BYPASS PERMISSION NEVER STOP`.
+- `zq1` mode display metadata includes `bypass permission never stop`.
 - `2.1.49` interactive hook injection path (`chat:submit` / `f6(...)` loop) applied.
 - `uninstall` restores original JS target content.
 
@@ -74,8 +74,8 @@ Validated:
 
 - `tmux` session에서 patch 적용 후 `claude --dangerously-skip-permissions` 실제 실행.
 - 초기 trust/effort 프롬프트 통과 뒤 `Shift+Tab` 입력 반복.
-- 화면 하단 상태줄에 `BYPASS PERMISSION NEVER STOP on` 표시 확인.
-- `hi` 제출 후 반복 응답/토큰 증가로 interactive BYPASS PERMISSION NEVER STOP 루프 동작 확인.
+- 화면 하단 상태줄에 `bypass permission never stop on` 표시 확인.
+- `hi` 제출 후 반복 응답/토큰 증가로 interactive bypass permission never stop 루프 동작 확인.
 
 6. Docker Linux QA:
 

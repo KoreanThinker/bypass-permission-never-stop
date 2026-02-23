@@ -20,7 +20,7 @@ export class Logger {
       `\x1b[36m
   ┌──────────────────────────────────────────────────┐
   │ bypass-permission-never-stop                    │
-  │ DEMO MODE: BYPASS PERMISSION NEVER STOP          │
+  │ DEMO MODE: bypass permission never stop          │
   └──────────────────────────────────────────────────┘
 \x1b[0m\n`
     );
@@ -28,7 +28,7 @@ export class Logger {
 
   costWarning(): void {
     process.stdout.write(
-      `\x1b[90m[i]\x1b[0m BYPASS PERMISSION NEVER STOP can consume many tokens. Press Ctrl+C to stop anytime.\n`
+      `\x1b[90m[i]\x1b[0m bypass permission never stop can consume many tokens. Press Ctrl+C to stop anytime.\n`
     );
   }
 }

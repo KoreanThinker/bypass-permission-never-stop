@@ -125,7 +125,7 @@ export class Orchestrator {
       return {
         success: false,
         error:
-          "No compatible BYPASS PERMISSION NEVER STOP hook pattern found for this Claude CLI build.",
+          "No compatible bypass permission never stop hook pattern found for this Claude CLI build.",
       };
     }
 

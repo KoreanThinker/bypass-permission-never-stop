@@ -26,7 +26,7 @@ src/index.ts (Orchestrator)
   |      - preserve file permissions
   |
   +--> src/patcher/hook-injector.ts
-         - inject BYPASS PERMISSION NEVER STOP loop hook
+         - inject bypass permission never stop loop hook
          - attach circuit-breaker logic
 ```
 

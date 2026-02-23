@@ -20,7 +20,7 @@
       "id": "mode-display-name",
       "description": "Add display name for neverStop mode",
       "search": "case\"dontAsk\":return\"Don't Ask\"}}",
-      "replace": "case\"dontAsk\":return\"Don't Ask\";case\"neverStop\":return\"BYPASS PERMISSION NEVER STOP\"}}"
+      "replace": "case\"dontAsk\":return\"Don't Ask\";case\"neverStop\":return\"bypass permission never stop\"}}"
     }
   ]
 }

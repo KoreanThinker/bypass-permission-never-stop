@@ -18,8 +18,8 @@
     <text x="28" y="152">[+] Found: ~/.local/share/claude/versions/2.1.39</text>
     <text x="28" y="188">[*] Backing up original binary...</text>
     <text x="28" y="224">[*] Patching mode cycle array...</text>
-    <text x="28" y="260">[*] Injecting BYPASS PERMISSION NEVER STOP hook...</text>
+    <text x="28" y="260">[*] Injecting bypass permission never stop hook...</text>
     <text x="28" y="296">[+] Patch applied successfully (7 patches).</text>
-    <text x="28" y="332">[+] Run 'claude' -&gt; Shift+Tab -&gt; 'BYPASS PERMISSION NEVER STOP'.</text>
+    <text x="28" y="332">[+] Run 'claude' -&gt; Shift+Tab -&gt; 'bypass permission never stop'.</text>
   </g>
 </svg>

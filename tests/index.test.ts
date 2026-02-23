@@ -102,7 +102,7 @@ describe("Orchestrator", () => {
       expect(manifest.originalPath).toBe(targetPath);
     });
 
-    it("should fail when no compatible BYPASS PERMISSION NEVER STOP hook pattern exists", () => {
+    it("should fail when no compatible bypass permission never stop hook pattern exists", () => {
       const content = 'case"bypassPermissions":return"default"';
       const targetPath = createFakeTarget(content);
       writeSignature([
@@ -121,7 +121,7 @@ describe("Orchestrator", () => {
       const result = orch.install(targetPath, null);
 
       expect(result.success).toBe(false);
-      expect(result.error).toContain("No compatible BYPASS PERMISSION NEVER STOP hook pattern");
+      expect(result.error).toContain("No compatible bypass permission never stop hook pattern");
       expect(readFileSync(targetPath, "utf-8")).toBe(content);
       expect(existsSync(join(backupDir, "manifest.json"))).toBe(false);
     });
