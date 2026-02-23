@@ -43,6 +43,14 @@ describe("findClaudeCodeTarget strategies", () => {
     writeMachOBinary(join(versionsDir, "2.1.9"));
     writeMachOBinary(join(versionsDir, "2.1.11"));
 
+    const fakeBin = join(tempDir, "bin");
+    mkdirSync(fakeBin, { recursive: true });
+    process.env.PATH = fakeBin;
+    writeExecScript(join(fakeBin, "which"), "#!/bin/sh\nexit 1\n");
+    writeExecScript(join(fakeBin, "npm"), "#!/bin/sh\nexit 1\n");
+    writeExecScript(join(fakeBin, "pnpm"), "#!/bin/sh\nexit 1\n");
+    writeExecScript(join(fakeBin, "yarn"), "#!/bin/sh\nexit 1\n");
+
     const target = await findClaudeCodeTarget();
     expect(target).not.toBeNull();
     expect(target?.path).toBe(join(versionsDir, "2.1.11"));

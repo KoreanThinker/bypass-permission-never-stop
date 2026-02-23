@@ -68,7 +68,8 @@ describe("Integration: Full Install/Uninstall Flow", () => {
           id: "mode-display-name",
           description: "Add display name",
           search: "case\"dontAsk\":return\"Don't Ask\"}}",
-          replace: "case\"dontAsk\":return\"Don't Ask\";case\"neverStop\":return\"Never Stop\"}}",
+          replace:
+            "case\"dontAsk\":return\"Don't Ask\";case\"neverStop\":return\"bypass permission never stop\"}}",
         },
       ],
     };
@@ -92,7 +93,9 @@ describe("Integration: Full Install/Uninstall Flow", () => {
     const patched = readFileSync(targetPath, "utf-8");
     expect(patched).toContain('return"neverStop"');
     expect(patched).toContain('case"neverStop":return"default"');
-    expect(patched).toContain('case"neverStop":return"Never Stop"');
+    expect(patched).toContain(
+      'case"neverStop":return"bypass permission never stop"'
+    );
 
     // Verify file permissions preserved
     const stats = statSync(targetPath);

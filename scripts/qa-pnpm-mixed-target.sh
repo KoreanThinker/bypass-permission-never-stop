@@ -67,7 +67,7 @@ chmod +x "$BIN_DIR/which" "$BIN_DIR/npm" "$BIN_DIR/pnpm" "$BIN_DIR/yarn"
 pushd "$REPO_ROOT" >/dev/null
 npm run build >/dev/null
 
-HOME="$HOME_DIR" PATH="$BIN_DIR:$NODE_BIN_DIR:/usr/bin:/bin" node dist/cli.js >/tmp/qa-mixed-install.out 2>/tmp/qa-mixed-install.err
+HOME="$HOME_DIR" PATH="$BIN_DIR:$NODE_BIN_DIR:/usr/bin:/bin" node dist/cli.js --yes >/tmp/qa-mixed-install.out 2>/tmp/qa-mixed-install.err
 
 grep -q 'neverStop' "$JS_TARGET"
 grep -q 'XT.filter(m=>m.type==="user")' "$JS_TARGET"

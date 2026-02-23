@@ -165,7 +165,9 @@ export function buildCli(signaturesDir?: string, options?: CliBuildOptions): Com
 
     if (result.success) {
       logger.success(`Patch applied successfully (${result.patchedCount} patches).`);
-      logger.success("Run 'claude' and hit Shift+Tab to find 'Never Stop' mode.");
+      logger.success(
+        "Run 'claude' and hit Shift+Tab to find 'bypass permission never stop' mode."
+      );
       sessionLogger.log(`Patch successful: ${result.patchedCount} patches applied`, "INSTALL");
     } else {
       logger.error(`Patch failed: ${result.error}`);

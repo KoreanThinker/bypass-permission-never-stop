@@ -131,7 +131,7 @@ function Qu(T){switch(T){
 `cli.mjs`를 읽어들여 Shift+Tab 모드 사이클에 커스텀 모드를 주입.
 
 - **목표 1 (모드 사이클 패치)**: `VNT` 함수의 `case"bypassPermissions":return"default"` 를 `case"bypassPermissions":return"neverStop"` 로 바이너리 치환 (같은 길이). 그리고 `case"dontAsk":return"default"` 뒤에 `case"neverStop":return"default"` 를 추가.
-- **목표 2 (모드 표시명 패치)**: `Qu` 함수에 `case"neverStop":return"Never Stop"` 케이스 추가.
+- **목표 2 (모드 표시명 패치)**: `Qu` 함수에 `case"neverStop":return"bypass permission never stop"` 케이스 추가.
 - **목표 3 (GAT 배열 패치)**: `GAT` 배열에 `"neverStop"` 추가.
 - **중요**: 바이너리 패치이므로 **모든 치환은 반드시 동일한 바이트 길이**여야 한다. 길이가 다르면 바이너리가 깨진다.
 - 패턴 매칭 실패 시 에러 출력 + 지원 버전 목록 출력 후 안전 종료 (패치 미적용)

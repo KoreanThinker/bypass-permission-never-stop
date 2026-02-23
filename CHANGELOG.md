@@ -4,6 +4,30 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.11] - 2026-02-23
+
+### Changed
+
+- Updated never-stop mode display label to `bypass permission never stop` across patch signatures.
+- Updated 2.1.49 mode metadata to increase visual distinction from bypass mode:
+  - `color: "planMode"`
+  - `symbol: "🌈♾️"`
+  - full-wording `title`/`shortTitle`
+- Updated CLI and docs/demo copy to use the same full-wording mode label.
+
+### Fixed
+
+- Stabilized `tests/finder-strategies.test.ts` by isolating shell command resolution in the local-share precedence test so local developer global installs do not leak into test expectations.
+- Updated QA scripts to pass `--yes` for non-interactive install flow.
+
+### QA
+
+- `npm run build`
+- `npm test`
+- `npm run test:ci`
+- `bash scripts/qa-pnpm-v2149.sh`
+- `bash scripts/qa-pnpm-mixed-target.sh`
+
 ## [0.1.10] - 2026-02-20
 
 ### Changed

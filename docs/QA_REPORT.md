@@ -52,7 +52,7 @@ Validated:
 
 - Exact `2.1.49` signature selected over broad `2.1.x`.
 - `eT6` mode cycle patch applied with `neverStop` transition.
-- `zq1` mode display metadata includes `Never Stop`.
+- `zq1` mode display metadata includes `bypass permission never stop`.
 - `2.1.49` interactive hook injection path (`chat:submit` / `f6(...)` loop) applied.
 - `uninstall` restores original JS target content.
 
