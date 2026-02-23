@@ -176,10 +176,12 @@ export function buildCli(signaturesDir?: string, options?: CliBuildOptions): Com
     const result = orch.install(target.path, target.version);
 
     if (result.success) {
-      const verb = mode === "install" ? "Patch" : "Upgrade";
-      logger.success(`${verb} applied successfully (${result.patchedCount} patches).`);
+      const verb = mode === "install" ? "PATCH" : "UPGRADE";
       logger.success(
-        "Run 'claude' and hit Shift+Tab to find 'BYPASS PERMISSION NEVER STOP' mode."
+        `${verb} COMPLETE: BYPASS PERMISSION NEVER STOP READY (${result.patchedCount} patches).`
+      );
+      logger.success(
+        "Run 'claude' -> press Shift+Tab -> select 'BYPASS PERMISSION NEVER STOP'."
       );
       sessionLogger.log(
         `${modeLabel} successful: ${result.patchedCount} patches applied`,

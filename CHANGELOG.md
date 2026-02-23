@@ -4,6 +4,22 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.17] - 2026-02-23
+
+### Changed
+
+- Updated BYPASS PERMISSION NEVER STOP symbol from `∞` to `⟪∞⟫` for stronger mode visibility in demos.
+- Strengthened install UX messaging:
+  - banner line now emphasizes `DEMO MODE: BYPASS PERMISSION NEVER STOP`
+  - success line now uses `PATCH/UPGRADE COMPLETE: BYPASS PERMISSION NEVER STOP READY`
+
+### QA
+
+- `npm test`
+- `bash scripts/qa-pnpm-v2149.sh`
+- `bash scripts/qa-pnpm-v2150.sh`
+- `bash scripts/qa-pnpm-mixed-target.sh`
+
 ## [0.1.16] - 2026-02-23
 
 ### Changed

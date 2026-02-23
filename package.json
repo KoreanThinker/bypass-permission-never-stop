@@ -1,6 +1,6 @@
 {
   "name": "bypass-permission-never-stop",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "Claude Code never-stop mode installer",
   "main": "dist/index.js",
   "bin": {

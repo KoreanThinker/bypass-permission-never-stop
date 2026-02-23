@@ -20,6 +20,6 @@
     <text x="28" y="224">[*] Patching mode cycle array...</text>
     <text x="28" y="260">[*] Injecting BYPASS PERMISSION NEVER STOP hook...</text>
     <text x="28" y="296">[+] Patch applied successfully (7 patches).</text>
-    <text x="28" y="332">[+] Run 'claude' and hit Shift+Tab to find 'BYPASS PERMISSION NEVER STOP' mode.</text>
+    <text x="28" y="332">[+] Run 'claude' -&gt; Shift+Tab -&gt; 'BYPASS PERMISSION NEVER STOP'.</text>
   </g>
 </svg>
