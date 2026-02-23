@@ -8,15 +8,15 @@
 [![License MIT](https://img.shields.io/github/license/KoreanThinker/bypass-permission-never-stop?style=flat)](LICENSE)
 ![Stars](https://img.shields.io/github/stars/KoreanThinker/bypass-permission-never-stop?style=social)
 
-Installer that adds `never stop` mode to Claude Code's Shift+Tab cycle.
+Installer that adds `BYPASS PERMISSION NEVER STOP` mode to Claude Code's Shift+Tab cycle.
 
 ## 🎬 Live demo
 
-![Never stop mode demo](docs/assets/demo-never-stop.gif)
+![BYPASS PERMISSION NEVER STOP mode demo](docs/assets/demo-never-stop.gif)
 
 ## ⚙️ How it works
 
-- With `never stop on`, one submitted message is re-submitted repeatedly.
+- With `BYPASS PERMISSION NEVER STOP on`, one submitted message is re-submitted repeatedly.
 - The loop continues while the Claude process and session are still active.
 
 ## ✨ Highlights
@@ -51,7 +51,7 @@ npx bypass-permission-never-stop upgrade
 
 1. Run `claude`
 2. Press `Shift+Tab`
-3. Confirm bottom mode text shows `never stop on`
+3. Confirm bottom mode text shows `BYPASS PERMISSION NEVER STOP on`
 
 ## CI / non-interactive install
 
@@ -63,7 +63,7 @@ Use this only when you intentionally want unattended install.
 
 ## Sample prompt (one)
 
-Use this once `never stop` mode is enabled:
+Use this once `BYPASS PERMISSION NEVER STOP` mode is enabled:
 
 ```text
 Mission: Continuously find and fix real bugs from Sentry, GitHub issues, and direct code exploration; after each fix, immediately start the next bug cycle.

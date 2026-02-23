@@ -69,7 +69,7 @@ describe("Integration: Full Install/Uninstall Flow", () => {
           description: "Add display name",
           search: "case\"dontAsk\":return\"Don't Ask\"}}",
           replace:
-            "case\"dontAsk\":return\"Don't Ask\";case\"neverStop\":return\"bypass permission never stop\"}}",
+            "case\"dontAsk\":return\"Don't Ask\";case\"neverStop\":return\"BYPASS PERMISSION NEVER STOP\"}}",
         },
       ],
     };
@@ -94,7 +94,7 @@ describe("Integration: Full Install/Uninstall Flow", () => {
     expect(patched).toContain('return"neverStop"');
     expect(patched).toContain('case"neverStop":return"default"');
     expect(patched).toContain(
-      'case"neverStop":return"bypass permission never stop"'
+      'case"neverStop":return"BYPASS PERMISSION NEVER STOP"'
     );
 
     // Verify file permissions preserved

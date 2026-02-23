@@ -4,12 +4,27 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.16] - 2026-02-23
+
+### Changed
+
+- Changed BYPASS PERMISSION NEVER STOP display color from `error` to `warning` for higher visibility while keeping clear distinction from bypass mode.
+- Unified repository terminology to consistently use `BYPASS PERMISSION NEVER STOP` for user-facing mode naming across README/spec/docs/CLI/test messaging.
+- Set both mode `title` and `shortTitle` to `BYPASS PERMISSION NEVER STOP`.
+
+### QA
+
+- `npm test`
+- `bash scripts/qa-pnpm-v2149.sh`
+- `bash scripts/qa-pnpm-v2150.sh`
+- `bash scripts/qa-pnpm-mixed-target.sh`
+
 ## [0.1.15] - 2026-02-23
 
 ### Changed
 
-- Switched never-stop symbol from `✶✶` to Unicode infinity `∞` (non-emoji glyph) for clearer mode identity.
-- Changed never-stop display color from `autoAccept` to `error` (red) for stronger visual emphasis.
+- Switched BYPASS PERMISSION NEVER STOP symbol from `✶✶` to Unicode infinity `∞` (non-emoji glyph) for clearer mode identity.
+- Changed BYPASS PERMISSION NEVER STOP display color from `autoAccept` to `error` (red) for stronger visual emphasis.
 
 ### QA
 
@@ -22,9 +37,9 @@ All notable changes to this project are documented in this file.
 
 ### Changed
 
-- Removed rainbow-style never-stop symbol and switched to a stronger high-contrast mode style:
+- Removed rainbow-style BYPASS PERMISSION NEVER STOP symbol and switched to a stronger high-contrast mode style:
   - `title: "BYPASS PERMISSION NEVER STOP"`
-  - `shortTitle: "NEVER STOP"`
+  - `shortTitle: "BYPASS PERMISSION NEVER STOP"`
   - `symbol: "✶✶"`
   - `color: "autoAccept"`
 
@@ -64,7 +79,7 @@ All notable changes to this project are documented in this file.
 ### Fixed
 
 - Added explicit `2.1.50` signature support (`XV6` mode cycle + `o76` mode array + `Rq1` mode display map) to prevent install-time pattern validation failure on Claude Code `2.1.50`.
-- Added explicit `2.1.50` interactive hook injector pattern to restore never-stop submit-loop behavior on current `2.1.50` UI callback shape.
+- Added explicit `2.1.50` interactive hook injector pattern to restore BYPASS PERMISSION NEVER STOP submit-loop behavior on current `2.1.50` UI callback shape.
 
 ### Added
 
@@ -87,7 +102,7 @@ All notable changes to this project are documented in this file.
 
 ### Changed
 
-- Updated never-stop mode display label to `bypass permission never stop` across patch signatures.
+- Updated BYPASS PERMISSION NEVER STOP mode display label to `BYPASS PERMISSION NEVER STOP` across patch signatures.
 - Updated 2.1.49 mode metadata to increase visual distinction from bypass mode:
   - `color: "planMode"`
   - `symbol: "🌈♾️"`
@@ -130,7 +145,7 @@ All notable changes to this project are documented in this file.
 
 ### Added
 
-- Install confirmation prompt: `ARE YOU SURE INSTALL never-stop mode? (yes/no)`.
+- Install confirmation prompt: `ARE YOU SURE INSTALL BYPASS PERMISSION NEVER STOP mode? (yes/no)`.
 - `--yes` option to skip prompt for CI/non-interactive automation.
 - Non-interactive safety exit when install is launched without `--yes`.
 
@@ -146,7 +161,7 @@ All notable changes to this project are documented in this file.
 
 ### Fixed
 
-- Switched `2.1.49` never-stop hook from SDK result-path injection (non-interactive path) to interactive `chat:submit` callback patching.
+- Switched `2.1.49` BYPASS PERMISSION NEVER STOP hook from SDK result-path injection (non-interactive path) to interactive `chat:submit` callback patching.
 - Added loop patch at submit boundary so `neverStop` mode now re-submits prompts continuously in real interactive sessions.
 - Added dependency-array patch for submit callback to keep mode-aware loop logic fresh across mode changes.
 
@@ -154,7 +169,7 @@ All notable changes to this project are documented in this file.
 
 - Reproduced and verified in real `tmux` interactive session:
   - Launch `claude --dangerously-skip-permissions`
-  - Cycle to `never stop on` with `Shift+Tab`
+  - Cycle to `BYPASS PERMISSION NEVER STOP on` with `Shift+Tab`
   - Submit `hi` and observe repeated outputs/token growth over time
 - `npm run test:ci` still passes with coverage `> 90%`.
 
@@ -162,7 +177,7 @@ All notable changes to this project are documented in this file.
 
 ### Fixed
 
-- Removed invalid `continue` injection from the `2.1.49` never-stop hook patch (it caused `SyntaxError: Illegal continue statement` on `claude` startup).
+- Removed invalid `continue` injection from the `2.1.49` BYPASS PERMISSION NEVER STOP hook patch (it caused `SyntaxError: Illegal continue statement` on `claude` startup).
 - Kept `2.1.49` hook compatibility while preventing runtime crash after patch.
 
 ### QA
@@ -170,16 +185,16 @@ All notable changes to this project are documented in this file.
 - Verified in real `tmux` interactive session:
   - `npx` patch install
   - `claude --dangerously-skip-permissions` launch
-  - `Shift+Tab` cycle shows `never stop on` in the footer (`2.1.49`).
+  - `Shift+Tab` cycle shows `BYPASS PERMISSION NEVER STOP on` in the footer (`2.1.49`).
 
 ## [0.1.6] - 2026-02-20
 
 ### Fixed
 
 - Added an exact `2.1.49` signature set for current pnpm-installed Claude CLI layout (`U76`, `eT6`, `zq1` mode structures).
-- Added `2.1.49` never-stop hook injection pattern (`j6`/`Z6`/`w1`) so patch install no longer silently succeeds without behavior changes.
+- Added `2.1.49` BYPASS PERMISSION NEVER STOP hook injection pattern (`j6`/`Z6`/`w1`) so patch install no longer silently succeeds without behavior changes.
 - Updated signature selection to prefer the most specific matching range when signatures overlap (for example `2.1.49` over `2.1.x`).
-- Hardened install behavior to fail fast when no compatible never-stop hook exists, preventing partial patch state.
+- Hardened install behavior to fail fast when no compatible BYPASS PERMISSION NEVER STOP hook exists, preventing partial patch state.
 
 ### QA
 
@@ -237,7 +252,7 @@ All notable changes to this project are documented in this file.
 
 ### Added
 
-- Runtime patcher for Claude Code mode flow and never-stop hook injection
+- Runtime patcher for Claude Code mode flow and BYPASS PERMISSION NEVER STOP hook injection
 - Backup/restore manager with SHA-256 manifest
 - Version signature compatibility layer
 - Coverage-gated CI workflow

@@ -3,7 +3,7 @@
 ## 1. 프로젝트 개요 (Overview & Vision)
 
 - **제품명**: `bypass-permission-never-stop` (NPM 패키지명 & GitHub 레포명 통일)
-- **모드명**: **`bypass permission never stop`**
+- **모드명**: **`BYPASS PERMISSION NEVER STOP`**
 - **비전**: 잠든 사이, 주말 내내 Claude Code가 절대 쉬지 않고 코드를 리뷰하고, 테스트를 짜고, 리팩토링하게 만든다. 공식 지원하지 않는 UI(Shift+Tab)를 런타임 패치(Monkey Patching)로 뚫어버리는 **비공식 확장팩(God Mode)**.
 - **핵심 차별점**: 프롬프트나 외부 래퍼(Wrapper) 툴을 쓰는 것이 아니라, 유저가 이미 익숙한 **공식 Claude Code의 Shift+Tab 사이클에 직접 침투**하는 압도적이고 매끄러운 UX.
 
@@ -15,7 +15,7 @@
 - **바이럴 포인트 (트위터/X)**:
   - "Claude Code에 숨겨진 무한 노동 모드를 언락하는 법"
   - 해키(Hacky)한 런타임 조작 방식 자체가 개발자들의 흥미(Geeky)를 강하게 자극.
-  - "어제 `never stop` 모드 켜놓고 잤더니 아침에 PR이 50개 파여있음" 같은 밈(Meme) 생성 유도.
+  - "어제 `BYPASS PERMISSION NEVER STOP` 모드 켜놓고 잤더니 아침에 PR이 50개 파여있음" 같은 밈(Meme) 생성 유도.
 
 ## 3. 핵심 유저 경험 (UX)
 
@@ -29,13 +29,13 @@
    [*] Found: /opt/homebrew/lib/node_modules/@anthropic-ai/claude-code
    [*] Backing up cli.mjs (22.1MB)...
    [*] Patching mode cycle array...
-   [*] Injecting never-stop hook...
+   [*] Injecting BYPASS PERMISSION NEVER STOP hook...
    [+] Patch applied successfully. Run 'claude' and hit Shift+Tab.
    ```
 
 2. **실행**: 평소처럼 `claude` 명령어 입력.
 
-3. **모드 전환**: `Shift+Tab`을 누르면 기본 모드들(`default` → `acceptEdits` → `plan` → `bypassPermissions`)을 지나 마지막에 **`bypass permission never stop`** 모드가 등장.
+3. **모드 전환**: `Shift+Tab`을 누르면 기본 모드들(`default` → `acceptEdits` → `plan` → `bypassPermissions`)을 지나 마지막에 **`BYPASS PERMISSION NEVER STOP`** 모드가 등장.
 
 4. **작동**: 프롬프트(예: "모든 파일 보안 취약점 점검하고 수정해")를 입력하면, 작업이 끝났다고 판단해도 내부 Hook이 이를 가로채 **직전에 유저가 입력한 메시지를 다시 주입**하여 강제로 다음 루프를 실행. (에러가 나도 스스로 고치며 무한 전진).
 
@@ -131,7 +131,7 @@ function Qu(T){switch(T){
 `cli.mjs`를 읽어들여 Shift+Tab 모드 사이클에 커스텀 모드를 주입.
 
 - **목표 1 (모드 사이클 패치)**: `VNT` 함수의 `case"bypassPermissions":return"default"` 를 `case"bypassPermissions":return"neverStop"` 로 바이너리 치환 (같은 길이). 그리고 `case"dontAsk":return"default"` 뒤에 `case"neverStop":return"default"` 를 추가.
-- **목표 2 (모드 표시명 패치)**: `Qu` 함수에 `case"neverStop":return"bypass permission never stop"` 케이스 추가.
+- **목표 2 (모드 표시명 패치)**: `Qu` 함수에 `case"neverStop":return"BYPASS PERMISSION NEVER STOP"` 케이스 추가.
 - **목표 3 (GAT 배열 패치)**: `GAT` 배열에 `"neverStop"` 추가.
 - **중요**: 바이너리 패치이므로 **모든 치환은 반드시 동일한 바이트 길이**여야 한다. 길이가 다르면 바이너리가 깨진다.
 - 패턴 매칭 실패 시 에러 출력 + 지원 버전 목록 출력 후 안전 종료 (패치 미적용)
@@ -169,9 +169,9 @@ Claude Code는 빠르게 업데이트되며 (현재 v2.1.39), 난독화된 번�
 
 ## 5. 리스크 및 안전장치 (Failsafes)
 
-- **비용 모니터링 경고**: `never stop` 모드 진입 시 터미널 상단에 빨간 글씨로 **Warning: This mode will consume tokens indefinitely until Ctrl+C.** 출력.
+- **비용 모니터링 경고**: `BYPASS PERMISSION NEVER STOP` 모드 진입 시 터미널 상단에 빨간 글씨로 **Warning: This mode will consume tokens indefinitely until Ctrl+C.** 출력.
 - **순환 오류 브레이커 (Circuit Breaker)**: 완전히 똑같은 에러 문자열이 **5번** 연속으로 발생하면 (exact string match) 토큰 낭비 무한 루프로 판단, 예외적으로 강제 종료(Exit)시키는 방어 코드 주입.
-- **세션 로그**: never-stop 모드 동안의 모든 액션을 `~/.claude-never-stop/logs/` 에 **plain text (.log)** 로 타임스탬프와 함께 기록. 아침에 일어나서 `cat`으로 바로 확인 가능.
+- **세션 로그**: BYPASS PERMISSION NEVER STOP 모드 동안의 모든 액션을 `~/.claude-never-stop/logs/` 에 **plain text (.log)** 로 타임스탬프와 함께 기록. 아침에 일어나서 `cat`으로 바로 확인 가능.
 
 ## 6. 법적 고지 (Legal Notice)
 
@@ -233,7 +233,7 @@ bypass-permission-never-stop/
 
 - **NPM**: `npx bypass-permission-never-stop`으로 설치 (메인 채널)
 - **GitHub Releases**: 버전 태그별 바이너리 배포
-- **README**: 해킹 UI 애니메이션 GIF + never-stop 모드 동작 데모 GIF 포함
+- **README**: 해킹 UI 애니메이션 GIF + BYPASS PERMISSION NEVER STOP 모드 동작 데모 GIF 포함
 
 ## 10. 마일스톤
 

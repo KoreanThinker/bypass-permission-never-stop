@@ -3,9 +3,9 @@ import { UiPatcher, type MultiPatchResult } from "./ui-patcher.js";
 import { readFileSync } from "node:fs";
 
 const LEGACY_NEVER_STOP_HOOK_PATCH: PatchEntry = {
-  id: "never-stop-hook-legacy",
+  id: "bypass-permission-never-stop-hook-legacy",
   description:
-    "Inject never-stop hook into legacy agent loop success handler",
+    "Inject BYPASS PERMISSION NEVER STOP hook into legacy agent loop success handler",
   search:
     'yield{type:"result",subtype:"success",is_error:iR,duration_ms:Date.now()-g',
   replace:
@@ -13,9 +13,9 @@ const LEGACY_NEVER_STOP_HOOK_PATCH: PatchEntry = {
 };
 
 const V2149_NEVER_STOP_HOOK_PATCH: PatchEntry = {
-  id: "never-stop-hook-v2149",
+  id: "bypass-permission-never-stop-hook-v2149",
   description:
-    "Inject never-stop loop into 2.1.49 interactive chat submit handler",
+    "Inject BYPASS PERMISSION NEVER STOP loop into 2.1.49 interactive chat submit handler",
   search:
     "await f6(e6,{setCursorOffset:E6,clearBuffer:K5,resetHistory:bH})},[a6,W1,O1,p6,L6,F,dA,U,PX.suggestions,f6,X6,K5,bH,n6,z6,i6,V,p7]),",
   replace:
@@ -23,9 +23,9 @@ const V2149_NEVER_STOP_HOOK_PATCH: PatchEntry = {
 };
 
 const V2150_NEVER_STOP_HOOK_PATCH: PatchEntry = {
-  id: "never-stop-hook-v2150",
+  id: "bypass-permission-never-stop-hook-v2150",
   description:
-    "Inject never-stop loop into 2.1.50 interactive chat submit handler",
+    "Inject BYPASS PERMISSION NEVER STOP loop into 2.1.50 interactive chat submit handler",
   search:
     "await n(x1,{setCursorOffset:Y6,clearBuffer:y3,resetHistory:U5})},[o6,O1,g6,C6,v6,x,m8,rY.suggestions,n,z6,y3,U5,H7,k6,d8,N,g8]),",
   replace:
@@ -33,9 +33,9 @@ const V2150_NEVER_STOP_HOOK_PATCH: PatchEntry = {
 };
 
 /**
- * HookInjector handles the "never stop" logic injection.
+ * HookInjector handles the "BYPASS PERMISSION NEVER STOP" logic injection.
  *
- * The never-stop mechanism works by modifying the success result handler
+ * The BYPASS PERMISSION NEVER STOP mechanism works by modifying the success result handler
  * in the agent loop. When mode is "neverStop", instead of yielding the
  * final success result and stopping, the code re-injects the last user
  * message to force another iteration.
@@ -59,7 +59,7 @@ export class HookInjector {
   }
 
   /**
-   * Return all known never-stop hook patches.
+   * Return all known BYPASS PERMISSION NEVER STOP hook patches.
    */
   getNeverStopPatches(): PatchEntry[] {
     return [...this.hookPatches];
@@ -79,14 +79,14 @@ export class HookInjector {
   }
 
   /**
-   * Try to inject the never-stop hook into the content buffer.
+   * Try to inject the BYPASS PERMISSION NEVER STOP hook into the content buffer.
    */
   injectHook(content: Buffer): { success: boolean; buffer?: Buffer; error?: string } {
     const patch = this.findCompatibleHookPatch(content);
     if (!patch) {
       return {
         success: false,
-        error: "No compatible never-stop hook pattern found in target",
+        error: "No compatible BYPASS PERMISSION NEVER STOP hook pattern found in target",
       };
     }
     return this.patcher.applyPatch(content, patch);
@@ -110,7 +110,7 @@ export class HookInjector {
 
   /**
    * Get JavaScript code snippet for extracting the last user message.
-   * Used in the never-stop re-injection logic.
+   * Used in the BYPASS PERMISSION NEVER STOP re-injection logic.
    */
   getLastUserMessageExtractor(): string {
     return 'XT.filter(m=>m.type==="user").pop()';

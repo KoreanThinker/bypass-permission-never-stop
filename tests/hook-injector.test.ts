@@ -27,16 +27,22 @@ describe("HookInjector", () => {
     it("should expose multiple known hook patch variants", () => {
       const patches = injector.getNeverStopPatches();
       expect(patches.length).toBeGreaterThanOrEqual(3);
-      expect(patches.some((p) => p.id === "never-stop-hook-legacy")).toBe(true);
-      expect(patches.some((p) => p.id === "never-stop-hook-v2149")).toBe(true);
-      expect(patches.some((p) => p.id === "never-stop-hook-v2150")).toBe(true);
+      expect(
+        patches.some((p) => p.id === "bypass-permission-never-stop-hook-legacy")
+      ).toBe(true);
+      expect(
+        patches.some((p) => p.id === "bypass-permission-never-stop-hook-v2149")
+      ).toBe(true);
+      expect(
+        patches.some((p) => p.id === "bypass-permission-never-stop-hook-v2150")
+      ).toBe(true);
     });
   });
 
   describe("generateNeverStopPatch", () => {
     it("should return the legacy patch for backward compatibility", () => {
       const patch = injector.generateNeverStopPatch();
-      expect(patch.id).toBe("never-stop-hook-legacy");
+      expect(patch.id).toBe("bypass-permission-never-stop-hook-legacy");
       expect(patch.search).toContain("result");
       expect(patch.search).toContain("success");
       expect(patch.replace).toContain("neverStop");
@@ -45,7 +51,7 @@ describe("HookInjector", () => {
   });
 
   describe("injectHook", () => {
-    it("should inject the legacy never-stop hook into content", () => {
+    it("should inject the legacy BYPASS PERMISSION NEVER STOP hook into content", () => {
       const content = Buffer.from(
         'yield{type:"result",subtype:"success",is_error:iR,duration_ms:Date.now()-g'
       );
@@ -56,7 +62,7 @@ describe("HookInjector", () => {
       expect(result.buffer!.toString("utf-8")).toContain("XT.filter");
     });
 
-    it("should inject the v2.1.49 never-stop hook into content", () => {
+    it("should inject the v2.1.49 BYPASS PERMISSION NEVER STOP hook into content", () => {
       const content = Buffer.from(
         "await f6(e6,{setCursorOffset:E6,clearBuffer:K5,resetHistory:bH})},[a6,W1,O1,p6,L6,F,dA,U,PX.suggestions,f6,X6,K5,bH,n6,z6,i6,V,p7]),"
       );
@@ -74,7 +80,7 @@ describe("HookInjector", () => {
       expect(result.buffer!.toString("utf-8")).not.toContain("continue");
     });
 
-    it("should inject the v2.1.50 never-stop hook into content", () => {
+    it("should inject the v2.1.50 BYPASS PERMISSION NEVER STOP hook into content", () => {
       const content = Buffer.from(
         "await n(x1,{setCursorOffset:Y6,clearBuffer:y3,resetHistory:U5})},[o6,O1,g6,C6,v6,x,m8,rY.suggestions,n,z6,y3,U5,H7,k6,d8,N,g8]),"
       );
@@ -114,9 +120,11 @@ describe("HookInjector", () => {
       const allPatches = injector.buildAllPatches(uiPatches, content);
       expect(allPatches.length).toBeGreaterThan(uiPatches.length);
       expect(allPatches.some((p) => p.id === "mode-cycle")).toBe(true);
-      expect(allPatches.some((p) => p.id === "never-stop-hook-v2149")).toBe(
-        true
-      );
+      expect(
+        allPatches.some(
+          (p) => p.id === "bypass-permission-never-stop-hook-v2149"
+        )
+      ).toBe(true);
     });
 
     it("should select v2.1.50 hook patch when that pattern is present", () => {
@@ -132,9 +140,11 @@ describe("HookInjector", () => {
         "await n(x1,{setCursorOffset:Y6,clearBuffer:y3,resetHistory:U5})},[o6,O1,g6,C6,v6,x,m8,rY.suggestions,n,z6,y3,U5,H7,k6,d8,N,g8]),"
       );
       const allPatches = injector.buildAllPatches(uiPatches, content);
-      expect(allPatches.some((p) => p.id === "never-stop-hook-v2150")).toBe(
-        true
-      );
+      expect(
+        allPatches.some(
+          (p) => p.id === "bypass-permission-never-stop-hook-v2150"
+        )
+      ).toBe(true);
     });
 
     it("should return UI-only list when content has no supported hook pattern", () => {

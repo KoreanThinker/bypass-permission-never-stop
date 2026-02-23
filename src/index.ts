@@ -119,13 +119,13 @@ export class Orchestrator {
       content
     );
     const hasNeverStopHook = allPatches.some((patch) =>
-      patch.id.startsWith("never-stop-hook")
+      patch.id.startsWith("bypass-permission-never-stop-hook")
     );
     if (!hasNeverStopHook) {
       return {
         success: false,
         error:
-          "No compatible never-stop hook pattern found for this Claude CLI build.",
+          "No compatible BYPASS PERMISSION NEVER STOP hook pattern found for this Claude CLI build.",
       };
     }
 
