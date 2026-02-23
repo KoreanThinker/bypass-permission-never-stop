@@ -4,6 +4,19 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.18] - 2026-02-23
+
+### Fixed
+
+- Fixed lowercase status-line rendering by patching mode footer label transform from `toLowerCase()` to `toUpperCase()` in supported JS signatures (`2.1.49`, `2.1.50`).
+
+### QA
+
+- `npm test`
+- `bash scripts/qa-pnpm-v2149.sh`
+- `bash scripts/qa-pnpm-v2150.sh`
+- `bash scripts/qa-pnpm-mixed-target.sh`
+
 ## [0.1.17] - 2026-02-23
 
 ### Changed

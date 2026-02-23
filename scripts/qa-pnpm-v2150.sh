@@ -26,6 +26,7 @@ JSON
 cat > "$JS_TARGET" <<'EOF'
 var o76,b05,yS;var N78=E(()=>{o76=["acceptEdits","bypassPermissions","default","dontAsk","plan"],b05=[...o76],yS=b05});
 var R97,C97,Rq1;var V0=E(()=>{H4();N78();R97=b4.enum(yS),C97=b4.enum(o76),Rq1={default:{title:"Default",shortTitle:"Default",symbol:"",color:"text",external:"default"},plan:{title:"Plan Mode",shortTitle:"Plan",symbol:"⏸",color:"planMode",external:"plan"},acceptEdits:{title:"Accept edits",shortTitle:"Accept",symbol:"⏵⏵",color:"autoAccept",external:"acceptEdits"},bypassPermissions:{title:"Bypass Permissions",shortTitle:"Bypass",symbol:"⏵⏵",color:"error",external:"bypassPermissions"},dontAsk:{title:"Don't Ask",shortTitle:"DontAsk",symbol:"⏵⏵",color:"error",external:"dontAsk"}}});
+function statusLine(I){return pC6(I)," ",null,LQ(I).toLowerCase()," on"}
 function XV6(A,q){switch(A.mode){case"default":return"acceptEdits";case"acceptEdits":return"plan";case"plan":if(A.isBypassPermissionsModeAvailable)return"bypassPermissions";return"default";case"bypassPermissions":return"default";case"dontAsk":return"default"}}
 async function*Pf(){let x1="",Y6=0,y3=()=>{},U5=()=>{},o6=0,O1=0,g6=0,C6={mode:"default"},v6={getState:()=>({toolPermissionContext:{mode:"default"}})},x=0,m8=0,rY={suggestions:[]},n=async()=>{},z6=0,H7=0,k6=0,d8=0,N=0,g8=0;await n(x1,{setCursorOffset:Y6,clearBuffer:y3,resetHistory:U5})},[o6,O1,g6,C6,v6,x,m8,rY.suggestions,n,z6,y3,U5,H7,k6,d8,N,g8]),let j6={mode:"default"},Z6=[],w1=!1,u=0;yield{type:"result",subtype:"success",is_error:w1,duration_ms:Date.now()-u}}
 VERSION:"2.1.50"
@@ -70,6 +71,7 @@ HOME="$HOME_DIR" PATH="$BIN_DIR:$NODE_BIN_DIR:/usr/bin:/bin" node dist/cli.js --
 grep -Fq 'o76=["acceptEdits","bypassPermissions","default","dontAsk","neverStop","plan"]' "$JS_TARGET"
 grep -Fq 'case"bypassPermissions":return"neverStop";case"neverStop":return"default"' "$JS_TARGET"
 grep -Fq 'neverStop:{title:"BYPASS PERMISSION NEVER STOP",shortTitle:"BYPASS PERMISSION NEVER STOP",symbol:"⟪∞⟫",color:"warning",external:"neverStop"}' "$JS_TARGET"
+grep -Fq 'toUpperCase()," on"' "$JS_TARGET"
 grep -Fq 'while(v6.getState().toolPermissionContext.mode==="neverStop"){await n(x1,{setCursorOffset:Y6,clearBuffer:y3,resetHistory:U5})}' "$JS_TARGET"
 
 if grep -q 'neverStop' "$LOCAL_BIN"; then
