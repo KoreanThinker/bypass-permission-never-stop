@@ -34,7 +34,7 @@ VERSION:"2.1.39"
 EOF
 
 # Install patch
-HOME="$TMP_HOME" "$BIN" >/dev/null
+HOME="$TMP_HOME" "$BIN" --yes >/dev/null
 echo "[smoke] install: ok"
 
 # Validate key modifications landed

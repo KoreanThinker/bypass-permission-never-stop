@@ -1,6 +1,6 @@
 {
   "name": "bypass-permission-never-stop",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "Claude Code never-stop mode installer",
   "main": "dist/index.js",
   "bin": {
@@ -13,7 +13,8 @@
     "test": "vitest",
     "test:ci": "vitest run --coverage",
     "qa:mixed": "bash scripts/qa-pnpm-mixed-target.sh",
-    "qa:pnpm2149": "bash scripts/qa-pnpm-v2149.sh"
+    "qa:pnpm2149": "bash scripts/qa-pnpm-v2149.sh",
+    "qa:pnpm2150": "bash scripts/qa-pnpm-v2150.sh"
   },
   "keywords": [
     "claude",

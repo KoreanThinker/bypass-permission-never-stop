@@ -22,6 +22,16 @@ const V2149_NEVER_STOP_HOOK_PATCH: PatchEntry = {
     'await f6(e6,{setCursorOffset:E6,clearBuffer:K5,resetHistory:bH});while(K.mode==="neverStop"||L6.getState().toolPermissionContext.mode==="neverStop"){await f6(e6,{setCursorOffset:E6,clearBuffer:K5,resetHistory:bH})}},[a6,W1,O1,p6,L6,F,dA,U,PX.suggestions,f6,X6,K5,bH,n6,z6,i6,V,p7,K]),',
 };
 
+const V2150_NEVER_STOP_HOOK_PATCH: PatchEntry = {
+  id: "never-stop-hook-v2150",
+  description:
+    "Inject never-stop loop into 2.1.50 interactive chat submit handler",
+  search:
+    "await n(x1,{setCursorOffset:Y6,clearBuffer:y3,resetHistory:U5})},[o6,O1,g6,C6,v6,x,m8,rY.suggestions,n,z6,y3,U5,H7,k6,d8,N,g8]),",
+  replace:
+    'await n(x1,{setCursorOffset:Y6,clearBuffer:y3,resetHistory:U5});while(v6.getState().toolPermissionContext.mode==="neverStop"){await n(x1,{setCursorOffset:Y6,clearBuffer:y3,resetHistory:U5})}},[o6,O1,g6,C6,v6,x,m8,rY.suggestions,n,z6,y3,U5,H7,k6,d8,N,g8]),',
+};
+
 /**
  * HookInjector handles the "never stop" logic injection.
  *
@@ -38,6 +48,7 @@ export class HookInjector {
   private hookPatches: PatchEntry[] = [
     LEGACY_NEVER_STOP_HOOK_PATCH,
     V2149_NEVER_STOP_HOOK_PATCH,
+    V2150_NEVER_STOP_HOOK_PATCH,
   ];
 
   /**

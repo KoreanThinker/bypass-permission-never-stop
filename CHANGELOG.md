@@ -4,6 +4,30 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.12] - 2026-02-23
+
+### Fixed
+
+- Added explicit `2.1.50` signature support (`XV6` mode cycle + `o76` mode array + `Rq1` mode display map) to prevent install-time pattern validation failure on Claude Code `2.1.50`.
+- Added explicit `2.1.50` interactive hook injector pattern to restore never-stop submit-loop behavior on current `2.1.50` UI callback shape.
+
+### Added
+
+- New regression QA scenario for `2.1.50`: `scripts/qa-pnpm-v2150.sh` (`npm run qa:pnpm2150`).
+
+### Changed
+
+- `scripts/smoke-published.sh` now uses `--yes` to make published-package smoke checks work in non-interactive shells.
+
+### QA
+
+- `npm run build`
+- `npm test`
+- `bash scripts/qa-pnpm-v2149.sh`
+- `bash scripts/qa-pnpm-v2150.sh`
+- `bash scripts/qa-pnpm-mixed-target.sh`
+- Real `2.1.50` `cli.js` copy verification via `Orchestrator.install(..., \"2.1.50\")` and uninstall restore check.
+
 ## [0.1.11] - 2026-02-23
 
 ### Changed

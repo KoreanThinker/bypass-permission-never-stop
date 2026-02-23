@@ -1,0 +1,26 @@
+{
+  "versionRange": "2.1.50",
+  "minVersion": "2.1.50",
+  "maxVersion": "2.1.50",
+  "targetType": "js",
+  "patches": [
+    {
+      "id": "mode-cycle-xv6-v2150",
+      "description": "Add neverStop into XV6 mode cycle in 2.1.50",
+      "search": "function XV6(A,q){switch(A.mode){case\"default\":return\"acceptEdits\";case\"acceptEdits\":return\"plan\";case\"plan\":if(A.isBypassPermissionsModeAvailable)return\"bypassPermissions\";return\"default\";case\"bypassPermissions\":return\"default\";case\"dontAsk\":return\"default\"}}",
+      "replace": "function XV6(A,q){switch(A.mode){case\"default\":return\"acceptEdits\";case\"acceptEdits\":return\"plan\";case\"plan\":if(A.isBypassPermissionsModeAvailable)return\"bypassPermissions\";return\"default\";case\"bypassPermissions\":return\"neverStop\";case\"neverStop\":return\"default\";case\"dontAsk\":return\"default\"}}"
+    },
+    {
+      "id": "mode-array-o76-v2150",
+      "description": "Add neverStop to o76 mode array in 2.1.50",
+      "search": "o76=[\"acceptEdits\",\"bypassPermissions\",\"default\",\"dontAsk\",\"plan\"]",
+      "replace": "o76=[\"acceptEdits\",\"bypassPermissions\",\"default\",\"dontAsk\",\"neverStop\",\"plan\"]"
+    },
+    {
+      "id": "mode-display-rq1-v2150",
+      "description": "Add neverStop display metadata in Rq1 map in 2.1.50",
+      "search": "bypassPermissions:{title:\"Bypass Permissions\",shortTitle:\"Bypass\",symbol:\"⏵⏵\",color:\"error\",external:\"bypassPermissions\"},dontAsk:{title:\"Don't Ask\",shortTitle:\"DontAsk\",symbol:\"⏵⏵\",color:\"error\",external:\"dontAsk\"}}",
+      "replace": "bypassPermissions:{title:\"Bypass Permissions\",shortTitle:\"Bypass\",symbol:\"⏵⏵\",color:\"error\",external:\"bypassPermissions\"},dontAsk:{title:\"Don't Ask\",shortTitle:\"DontAsk\",symbol:\"⏵⏵\",color:\"error\",external:\"dontAsk\"},neverStop:{title:\"bypass permission never stop\",shortTitle:\"bypass permission never stop\",symbol:\"🌈♾️\",color:\"planMode\",external:\"neverStop\"}}"
+    }
+  ]
+}

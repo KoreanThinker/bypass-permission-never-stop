@@ -26,9 +26,10 @@ describe("HookInjector", () => {
   describe("getNeverStopPatches", () => {
     it("should expose multiple known hook patch variants", () => {
       const patches = injector.getNeverStopPatches();
-      expect(patches.length).toBeGreaterThanOrEqual(2);
+      expect(patches.length).toBeGreaterThanOrEqual(3);
       expect(patches.some((p) => p.id === "never-stop-hook-legacy")).toBe(true);
       expect(patches.some((p) => p.id === "never-stop-hook-v2149")).toBe(true);
+      expect(patches.some((p) => p.id === "never-stop-hook-v2150")).toBe(true);
     });
   });
 
@@ -73,6 +74,22 @@ describe("HookInjector", () => {
       expect(result.buffer!.toString("utf-8")).not.toContain("continue");
     });
 
+    it("should inject the v2.1.50 never-stop hook into content", () => {
+      const content = Buffer.from(
+        "await n(x1,{setCursorOffset:Y6,clearBuffer:y3,resetHistory:U5})},[o6,O1,g6,C6,v6,x,m8,rY.suggestions,n,z6,y3,U5,H7,k6,d8,N,g8]),"
+      );
+      const result = injector.injectHook(content);
+      expect(result.success).toBe(true);
+      expect(result.buffer).toBeDefined();
+      expect(result.buffer!.toString("utf-8")).toContain("neverStop");
+      expect(result.buffer!.toString("utf-8")).toContain(
+        'while(v6.getState().toolPermissionContext.mode==="neverStop")'
+      );
+      expect(result.buffer!.toString("utf-8")).toContain(
+        "await n(x1,{setCursorOffset:Y6,clearBuffer:y3,resetHistory:U5})"
+      );
+    });
+
     it("should fail gracefully when pattern not found", () => {
       const content = Buffer.from("no matching pattern here");
       const result = injector.injectHook(content);
@@ -98,6 +115,24 @@ describe("HookInjector", () => {
       expect(allPatches.length).toBeGreaterThan(uiPatches.length);
       expect(allPatches.some((p) => p.id === "mode-cycle")).toBe(true);
       expect(allPatches.some((p) => p.id === "never-stop-hook-v2149")).toBe(
+        true
+      );
+    });
+
+    it("should select v2.1.50 hook patch when that pattern is present", () => {
+      const uiPatches: PatchEntry[] = [
+        {
+          id: "mode-cycle",
+          description: "test",
+          search: "search1",
+          replace: "replace1",
+        },
+      ];
+      const content = Buffer.from(
+        "await n(x1,{setCursorOffset:Y6,clearBuffer:y3,resetHistory:U5})},[o6,O1,g6,C6,v6,x,m8,rY.suggestions,n,z6,y3,U5,H7,k6,d8,N,g8]),"
+      );
+      const allPatches = injector.buildAllPatches(uiPatches, content);
+      expect(allPatches.some((p) => p.id === "never-stop-hook-v2150")).toBe(
         true
       );
     });
@@ -178,6 +213,30 @@ describe("HookInjector", () => {
       const patched = readFileSync(filePath, "utf-8");
       expect(patched).toContain(
         "while(K.mode===\"neverStop\"||L6.getState().toolPermissionContext.mode===\"neverStop\")"
+      );
+    });
+
+    it("should select and apply the v2.1.50 hook patch when needed", () => {
+      const filePath = join(tempDir, "target-v2150");
+      const content =
+        'START case"bypassPermissions":return"default" ' +
+        "MIDDLE await n(x1,{setCursorOffset:Y6,clearBuffer:y3,resetHistory:U5})},[o6,O1,g6,C6,v6,x,m8,rY.suggestions,n,z6,y3,U5,H7,k6,d8,N,g8]), END";
+      writeFileSync(filePath, content);
+
+      const uiPatches: PatchEntry[] = [
+        {
+          id: "mode-cycle",
+          description: "test",
+          search: 'case"bypassPermissions":return"default"',
+          replace: 'case"bypassPermissions":return"neverStop"',
+        },
+      ];
+
+      const result = injector.patchFile(filePath, uiPatches);
+      expect(result.success).toBe(true);
+      const patched = readFileSync(filePath, "utf-8");
+      expect(patched).toContain(
+        'while(v6.getState().toolPermissionContext.mode==="neverStop")'
       );
     });
   });
