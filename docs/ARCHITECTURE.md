@@ -9,6 +9,11 @@ src/cli.ts
   v
 src/index.ts (Orchestrator)
   |
+  +--> src/doctor/doctor.ts
+  |      - run 10-step diagnostics
+  |      - detect state inconsistencies
+  |      - execute guided restore/reinstall flow
+  |
   +--> src/finder/target-finder.ts
   |      - detect installed Claude Code target
   |      - resolve target type/version
@@ -37,3 +42,4 @@ src/index.ts (Orchestrator)
 3. Backup manager snapshots original target.
 4. UI patcher + hook injector apply runtime modifications.
 5. Uninstall restores from backup manifest.
+6. Doctor validates runtime/backup/signature state and suggests or applies fixes.

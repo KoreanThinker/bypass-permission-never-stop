@@ -4,6 +4,28 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.20] - 2026-02-23
+
+### Added
+
+- Added `doctor` command for runtime diagnosis and guided auto-fix flow.
+- Added doctor diagnostics modules (`src/doctor/doctor.ts`, `src/doctor/report.ts`, `src/doctor/fixes.ts`) with 10 checks:
+  - target discovery/type
+  - version/signature validation
+  - patch/hook compatibility
+  - backup integrity
+  - state consistency
+  - installability simulation
+  - environment hints
+- Added `scripts/qa-doctor.sh` and `npm run qa:doctor`.
+
+### Changed
+
+- Updated README and troubleshooting docs with `doctor` usage guidance.
+- Prevented `doctor` from proposing reinstall on clean unmanaged runtimes.
+- Hardened backup cleanup logic to avoid deleting files outside backup directory.
+- Limited automatic reinstall to valid-backup inconsistency cases to avoid over-eager patch reapplication.
+
 ## [0.1.19] - 2026-02-23
 
 ### Changed

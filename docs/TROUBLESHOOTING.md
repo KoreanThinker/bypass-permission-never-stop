@@ -1,5 +1,15 @@
 # Troubleshooting
 
+## 먼저 doctor 실행 (권장)
+
+대부분의 문제는 아래 명령으로 현재 상태를 빠르게 진단할 수 있습니다.
+
+```bash
+npx bypass-permission-never-stop doctor
+```
+
+`doctor`는 target 탐지, 시그니처/훅 호환성, 백업 무결성을 점검하고 가능한 경우 복구 단계를 제안합니다.
+
 ## npm publish fails with E403 (2FA bypass required)
 
 Symptom:

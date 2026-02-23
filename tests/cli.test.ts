@@ -4,6 +4,7 @@ import {
   getDefaultPaths,
   getCliVersion,
   confirmInstallPrompt,
+  confirmDoctorFixPrompt,
 } from "../src/cli.js";
 import {
   mkdtempSync,
@@ -73,6 +74,12 @@ describe("buildCli", () => {
     expect(commands).toContain("upgrade");
   });
 
+  it("should have doctor command", () => {
+    const cli = buildCli(sigDir);
+    const commands = cli.commands.map((c) => c.name());
+    expect(commands).toContain("doctor");
+  });
+
   it("should resolve CLI version from package.json", () => {
     const version = getCliVersion();
     const pkg = JSON.parse(readFileSync(join(__dirname, "..", "package.json"), "utf-8"));
@@ -121,5 +128,12 @@ describe("buildCli", () => {
     expect(writeSpy).toHaveBeenCalledWith("Please type yes or no.\n");
     expect(close).toHaveBeenCalledTimes(1);
     writeSpy.mockRestore();
+  });
+
+  it("returns false for doctor confirmation in non-interactive shells", async () => {
+    Object.defineProperty(process.stdin, "isTTY", { configurable: true, value: false });
+    Object.defineProperty(process.stdout, "isTTY", { configurable: true, value: false });
+    const result = await confirmDoctorFixPrompt();
+    expect(result).toBe(false);
   });
 });

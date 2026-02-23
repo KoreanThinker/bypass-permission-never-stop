@@ -6,6 +6,9 @@ type Scenario = {
   installResult?: { success: boolean; patchedCount?: number; error?: string };
   uninstallResult?: { success: boolean; error?: string };
   supportedVersions?: string[];
+  doctorResult?: {
+    finalReport: { summary: { pass: number; warn: number; fail: number } };
+  };
 };
 
 async function setupCliScenario(s: Scenario) {
@@ -29,6 +32,11 @@ async function setupCliScenario(s: Scenario) {
   };
 
   const findTarget = vi.fn(async () => s.target ?? null);
+  const runDoctorFlow = vi.fn(async () =>
+    s.doctorResult ?? {
+      finalReport: { summary: { pass: 10, warn: 0, fail: 0 } },
+    }
+  );
 
   vi.doMock("../src/index.js", () => ({
     Orchestrator: vi.fn(() => orch),
@@ -44,9 +52,12 @@ async function setupCliScenario(s: Scenario) {
       log: sessionLog,
     })),
   }));
+  vi.doMock("../src/doctor/doctor.js", () => ({
+    runDoctorFlow,
+  }));
 
   const { buildCli } = await import("../src/cli.js");
-  return { buildCli, logger, sessionLog, orch, findTarget };
+  return { buildCli, logger, sessionLog, orch, findTarget, runDoctorFlow };
 }
 
 describe("CLI actions", () => {
@@ -80,6 +91,7 @@ describe("CLI actions", () => {
     vi.unmock("../src/finder/target-finder.js");
     vi.unmock("../src/utils/logger.js");
     vi.unmock("../src/utils/session-logger.js");
+    vi.unmock("../src/doctor/doctor.js");
   });
 
   it("runs install action successfully", async () => {
@@ -264,5 +276,36 @@ describe("CLI actions", () => {
     expect(sessionLog).toHaveBeenCalledWith("Install cancelled by user", "INSTALL");
     expect(orch.install).not.toHaveBeenCalled();
     expect(exitSpy).not.toHaveBeenCalled();
+  });
+
+  it("runs doctor action successfully when no failures remain", async () => {
+    const { buildCli, logger, sessionLog, runDoctorFlow } = await setupCliScenario({
+      doctorResult: {
+        finalReport: { summary: { pass: 8, warn: 2, fail: 0 } },
+      },
+    });
+    const cli = buildCli("/tmp/signatures");
+
+    await cli.parseAsync(["node", "cmd", "doctor"], { from: "node" });
+
+    expect(logger.info).toHaveBeenCalledWith("Starting doctor flow...");
+    expect(runDoctorFlow).toHaveBeenCalledTimes(1);
+    expect(sessionLog).toHaveBeenCalledWith("Doctor started", "DOCTOR");
+    expect(exitSpy).not.toHaveBeenCalled();
+  });
+
+  it("exits when doctor reports unresolved failures", async () => {
+    const { buildCli, runDoctorFlow } = await setupCliScenario({
+      doctorResult: {
+        finalReport: { summary: { pass: 5, warn: 2, fail: 1 } },
+      },
+    });
+    const cli = buildCli("/tmp/signatures");
+
+    await expect(
+      cli.parseAsync(["node", "cmd", "doctor"], { from: "node" })
+    ).rejects.toThrow("EXIT:1");
+
+    expect(runDoctorFlow).toHaveBeenCalledTimes(1);
   });
 });

@@ -23,6 +23,8 @@ Installer that adds `bypass permission never stop` mode to Claude Code's Shift+T
 
 - 🚀 One-command install
 - 🔁 Continuous re-submit loop mode
+- 🔄 One-command upgrade with `upgrade`/`update`
+- 🩺 One-command diagnosis with `doctor`
 - ♻️ Safe rollback with `uninstall`
 
 ## Quick start
@@ -41,11 +43,39 @@ npx bypass-permission-never-stop uninstall
 
 ## Upgrade (best practice)
 
+When a new package version is released, use upgrade instead of manual uninstall + install.
+
 ```bash
-npx bypass-permission-never-stop upgrade
+npx bypass-permission-never-stop@latest upgrade
 ```
 
-`upgrade` is the recommended path over manual `uninstall` + install.
+Alias command:
+
+```bash
+npx bypass-permission-never-stop@latest update
+```
+
+Non-interactive mode:
+
+```bash
+npx bypass-permission-never-stop@latest upgrade --yes
+```
+
+`upgrade` restores the previous backup first, then applies the latest patch.
+
+## Doctor (diagnose + guided fixes)
+
+Run diagnosis first when install/upgrade behavior looks wrong:
+
+```bash
+npx bypass-permission-never-stop doctor
+```
+
+What `doctor` does:
+
+- Runs target/signature/hook/backup consistency checks
+- Prints PASS/WARN/FAIL summary and next commands
+- Offers guided auto-fixes (restore/reinstall) with a single confirmation when inconsistent state is detected
 
 ## What you should see
 

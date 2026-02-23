@@ -6,6 +6,7 @@ import { readFileSync, realpathSync } from "node:fs";
 import { createInterface } from "node:readline/promises";
 import { Orchestrator } from "./index.js";
 import { findClaudeCodeTarget } from "./finder/target-finder.js";
+import { runDoctorFlow } from "./doctor/doctor.js";
 import { Logger } from "./utils/logger.js";
 import { SessionLogger } from "./utils/session-logger.js";
 
@@ -35,6 +36,7 @@ export function getCliVersion(): string {
 
 export type CliBuildOptions = {
   confirmInstall?: () => Promise<boolean>;
+  confirmDoctorFix?: () => Promise<boolean>;
 };
 
 type PromptIO = {
@@ -74,10 +76,38 @@ export async function confirmInstallPrompt(promptFactory?: PromptFactory): Promi
   }
 }
 
+export async function confirmDoctorFixPrompt(
+  promptFactory?: PromptFactory
+): Promise<boolean> {
+  if (!process.stdin.isTTY || !process.stdout.isTTY) {
+    return false;
+  }
+
+  const rl = (promptFactory ?? createInterface)({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  try {
+    while (true) {
+      const answer = (await rl.question("Run doctor fixes now? (yes/no): "))
+        .trim()
+        .toLowerCase();
+
+      if (answer === "yes" || answer === "y") return true;
+      if (answer === "no" || answer === "n" || answer === "") return false;
+      process.stdout.write("Please type yes or no.\n");
+    }
+  } finally {
+    rl.close();
+  }
+}
+
 export function buildCli(signaturesDir?: string, options?: CliBuildOptions): Command {
   const program = new Command();
   const logger = new Logger();
   const confirmInstall = options?.confirmInstall ?? confirmInstallPrompt;
+  const confirmDoctorFix = options?.confirmDoctorFix ?? confirmDoctorFixPrompt;
 
   const defaultSigDir = signaturesDir ?? join(__dirname, "..", "signatures");
   const paths = getDefaultPaths();
@@ -262,6 +292,44 @@ export function buildCli(signaturesDir?: string, options?: CliBuildOptions): Com
         cmdOptions?.yes ?? localOpts.yes ?? globalOpts.yes
       );
       await runInstallFlow("upgrade", skipPrompt);
+    });
+
+  // Doctor command
+  program
+    .command("doctor")
+    .description("Diagnose runtime state and apply guided auto-fixes")
+    .action(async () => {
+      logger.banner();
+      logger.info("Starting doctor flow...");
+
+      const sessionLogger = new SessionLogger(paths.logDir);
+      sessionLogger.log("Doctor started", "DOCTOR");
+
+      try {
+        const result = await runDoctorFlow({
+          signaturesDir: defaultSigDir,
+          backupDir: paths.backupDir,
+          logDir: paths.logDir,
+          interactive: !!(process.stdin.isTTY && process.stdout.isTTY),
+          logger,
+          confirmDangerous: confirmDoctorFix,
+        });
+
+        sessionLogger.log(
+          `Doctor completed (pass=${result.finalReport.summary.pass}, warn=${result.finalReport.summary.warn}, fail=${result.finalReport.summary.fail})`,
+          "DOCTOR"
+        );
+
+        if (result.finalReport.summary.fail > 0) {
+          sessionLogger.log("Doctor finished with unresolved failures", "DOCTOR");
+          process.exit(1);
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        logger.error(`Doctor failed: ${message}`);
+        sessionLogger.log(`Doctor failed: ${message}`, "DOCTOR");
+        process.exit(1);
+      }
     });
 
   return program;
