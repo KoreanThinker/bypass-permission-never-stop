@@ -1,12 +1,22 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync } from "node:fs";
+import {
+  mkdtempSync,
+  mkdirSync,
+  rmSync,
+  writeFileSync,
+  readFileSync,
+  unlinkSync,
+} from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { BackupManager } from "../src/backup/backup-manager.js";
+import { HookInjector } from "../src/patcher/hook-injector.js";
+import { createFixActions } from "../src/doctor/fixes.js";
 import {
   collectDoctorReport,
   runDoctorFlow,
   type DoctorLogger,
+  type DoctorReport,
 } from "../src/doctor/doctor.js";
 
 function writeSignature(signaturesDir: string): void {
@@ -47,6 +57,30 @@ function writeInstallableTarget(path: string): void {
       'function VNT(T){switch(T.mode){case"bypassPermissions":return"default";case"dontAsk":return"default"}}',
       'function Qu(T){switch(T){case"dontAsk":return"Don\'t Ask"}}',
       'yield{type:"result",subtype:"success",is_error:iR,duration_ms:Date.now()-g',
+    ].join("\n"),
+    "utf-8"
+  );
+}
+
+function writeUiPatchedOnlyTarget(path: string): void {
+  writeFileSync(
+    path,
+    [
+      'function VNT(T){switch(T.mode){case"bypassPermissions":return"neverStop";case"dontAsk":return"default";case"neverStop":return"default"}}',
+      'function Qu(T){switch(T){case"dontAsk":return"Don\'t Ask";case"neverStop":return"bypass permission never stop"}}',
+    ].join("\n"),
+    "utf-8"
+  );
+}
+
+function writeFullyPatchedTarget(path: string): void {
+  const hookReplace = new HookInjector().generateNeverStopPatch().replace;
+  writeFileSync(
+    path,
+    [
+      'function VNT(T){switch(T.mode){case"bypassPermissions":return"neverStop";case"dontAsk":return"default";case"neverStop":return"default"}}',
+      'function Qu(T){switch(T){case"dontAsk":return"Don\'t Ask";case"neverStop":return"bypass permission never stop"}}',
+      hookReplace,
     ].join("\n"),
     "utf-8"
   );
@@ -211,5 +245,219 @@ describe("Doctor", () => {
     expect(readFileSync(targetPath, "utf-8")).not.toContain(
       'case"bypassPermissions":return"neverStop"'
     );
+  });
+
+  it("skips automatic fixes in non-interactive mode", async () => {
+    writeSignature(signaturesDir);
+    writeInstallableTarget(targetPath);
+    const backup = new BackupManager(backupDir);
+    backup.createBackup(targetPath, "2.1.49");
+
+    const confirmDangerous = vi.fn(async () => true);
+    const logger = createLogger();
+    const result = await runDoctorFlow({
+      signaturesDir,
+      backupDir,
+      logDir,
+      interactive: false,
+      logger,
+      confirmDangerous,
+      findTarget: async () => ({ path: targetPath, type: "js", version: "2.1.49" }),
+      runCommand: (cmd) => (cmd === "which claude" ? targetPath : null),
+    });
+
+    expect(result.plannedFixes.length).toBeGreaterThan(0);
+    expect(result.executedFixes).toHaveLength(0);
+    expect(confirmDangerous).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledWith(
+      expect.stringContaining("non-interactive shell")
+    );
+  });
+
+  it("cancels automatic fixes when user does not confirm", async () => {
+    writeSignature(signaturesDir);
+    writeInstallableTarget(targetPath);
+    const backup = new BackupManager(backupDir);
+    backup.createBackup(targetPath, "2.1.49");
+
+    const logger = createLogger();
+    const result = await runDoctorFlow({
+      signaturesDir,
+      backupDir,
+      logDir,
+      interactive: true,
+      logger,
+      confirmDangerous: async () => false,
+      findTarget: async () => ({ path: targetPath, type: "js", version: "2.1.49" }),
+      runCommand: (cmd) => (cmd === "which claude" ? targetPath : null),
+    });
+
+    expect(result.plannedFixes.length).toBeGreaterThan(0);
+    expect(result.executedFixes).toHaveLength(0);
+    expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining("cancelled by user"));
+  });
+
+  it("reports failed action when reinstall becomes impossible mid-run", async () => {
+    writeSignature(signaturesDir);
+    writeInstallableTarget(targetPath);
+    const backup = new BackupManager(backupDir);
+    backup.createBackup(targetPath, "2.1.49");
+
+    const logger = createLogger();
+    const result = await runDoctorFlow({
+      signaturesDir,
+      backupDir,
+      logDir,
+      interactive: true,
+      logger,
+      confirmDangerous: async () => {
+        unlinkSync(join(backupDir, "manifest.json"));
+        writeFullyPatchedTarget(targetPath);
+        return true;
+      },
+      findTarget: async () => ({ path: targetPath, type: "js", version: "2.1.49" }),
+      runCommand: (cmd) => (cmd === "which claude" ? targetPath : null),
+    });
+
+    expect(result.executedFixes).toHaveLength(0);
+    expect(result.plannedFixes).toContain("Apply never-stop patch on resolved JS target");
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.stringContaining("doctor fix failed:")
+    );
+  });
+
+  it("reports failures and suggestions when target discovery fails", async () => {
+    const report = await collectDoctorReport({
+      signaturesDir,
+      backupDir,
+      findTarget: async () => null,
+      runCommand: () => null,
+    });
+
+    expect(report.checks.find((c) => c.id === "target-discovery")?.status).toBe("fail");
+    expect(report.checks.find((c) => c.id === "environment-hints")?.status).toBe("warn");
+    expect(report.suggestedCommands).toContain("which claude");
+    expect(report.suggestedCommands).toContain("claude --version");
+    expect(report.suggestedCommands).toContain(
+      "npx -y bypass-permission-never-stop@latest upgrade"
+    );
+    expect(report.suggestedCommands).not.toContain(
+      "npx -y bypass-permission-never-stop@latest doctor"
+    );
+  });
+
+  it("warns on mixed-target shell path and suggests upgrade on signature mismatch", async () => {
+    writeInstallableTarget(targetPath);
+
+    const report = await collectDoctorReport({
+      signaturesDir,
+      backupDir,
+      findTarget: async () => ({ path: targetPath, type: "js", version: "9.9.9" }),
+      runCommand: (cmd) => {
+        if (cmd === "which claude") return "/tmp/.local/share/claude/versions/2.1.50/claude";
+        if (cmd === "pnpm root -g") return "/tmp/pnpm-global";
+        if (cmd === "npm root -g") return "/tmp/npm-global";
+        if (cmd === "yarn global dir") return "/tmp/yarn-global";
+        return null;
+      },
+    });
+
+    expect(report.checks.find((c) => c.id === "environment-hints")?.status).toBe("warn");
+    expect(report.checks.find((c) => c.id === "signature-match")?.status).toBe("fail");
+    expect(report.suggestedCommands).toContain("claude --version");
+    expect(report.suggestedCommands).toContain(
+      "npx -y bypass-permission-never-stop@latest upgrade"
+    );
+  });
+
+  it("flags partial patch markers as inconsistent runtime state", async () => {
+    writeSignature(signaturesDir);
+    writeUiPatchedOnlyTarget(targetPath);
+
+    const report = await collectDoctorReport({
+      signaturesDir,
+      backupDir,
+      findTarget: async () => ({ path: targetPath, type: "js", version: "2.1.49" }),
+      runCommand: (cmd) => (cmd === "which claude" ? targetPath : null),
+    });
+
+    expect(report.checks.find((c) => c.id === "hook-compatibility")?.status).toBe("fail");
+    expect(report.checks.find((c) => c.id === "patch-state-consistency")?.status).toBe("fail");
+    expect(report.checks.find((c) => c.id === "installability")?.status).toBe("fail");
+    expect(report.suggestedCommands).toContain(
+      "npx -y bypass-permission-never-stop@latest doctor"
+    );
+  });
+
+  it("warns when runtime is patched but backup manifest is missing", async () => {
+    writeSignature(signaturesDir);
+    writeFullyPatchedTarget(targetPath);
+
+    const report = await collectDoctorReport({
+      signaturesDir,
+      backupDir,
+      findTarget: async () => ({ path: targetPath, type: "js", version: "2.1.49" }),
+      runCommand: (cmd) => (cmd === "which claude" ? targetPath : null),
+    });
+
+    expect(report.checks.find((c) => c.id === "pattern-validation")?.status).toBe("pass");
+    expect(report.checks.find((c) => c.id === "hook-compatibility")?.status).toBe("pass");
+    expect(report.checks.find((c) => c.id === "patch-state-consistency")?.status).toBe("warn");
+    expect(report.checks.find((c) => c.id === "installability")?.status).toBe("pass");
+  });
+
+  it("guards reinstall action when no JS target can be resolved", async () => {
+    writeSignature(signaturesDir);
+
+    const report: DoctorReport = {
+      checks: [
+        {
+          id: "backup-integrity",
+          title: "Backup manifest integrity",
+          status: "pass",
+          details: "ok",
+        },
+        {
+          id: "patch-state-consistency",
+          title: "Patched state consistency",
+          status: "fail",
+          details: "inconsistent",
+        },
+      ],
+      summary: { pass: 1, warn: 0, fail: 1 },
+      suggestedCommands: [],
+      snapshot: {
+        target: null,
+        signature: null,
+        validation: null,
+        backupManifestPresent: false,
+        backupIntegrity: true,
+        runtimeUiPatched: false,
+        runtimeHookPatched: false,
+        runtimeFullyPatched: false,
+        canInstall: true,
+        whichClaudePath: null,
+        pnpmRoot: null,
+        npmRoot: null,
+        yarnGlobalDir: null,
+      },
+    };
+
+    const actions = createFixActions(
+      {
+        signaturesDir,
+        backupDir,
+        logDir,
+        interactive: true,
+        logger: createLogger(),
+      },
+      report
+    );
+
+    const reinstall = actions.find((action) => action.id === "reinstall-patch");
+    expect(reinstall).toBeDefined();
+    const result = await reinstall!.run();
+    expect(result.success).toBe(false);
+    expect(result.message).toContain("no JS target");
   });
 });
